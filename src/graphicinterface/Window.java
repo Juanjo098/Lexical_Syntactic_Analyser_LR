@@ -1,5 +1,10 @@
 package graphicinterface;
 
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
 public class Window extends javax.swing.JFrame {
 
     /**
@@ -7,6 +12,7 @@ public class Window extends javax.swing.JFrame {
      */
     public Window() {
         initComponents();
+        initIDE();
     }
 
     /**
@@ -28,10 +34,22 @@ public class Window extends javax.swing.JFrame {
         jTextPaneTerminal = new javax.swing.JTextPane();
         jScrollPaneTable = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jMenuBar = new javax.swing.JMenuBar();
+        jMenuFile = new javax.swing.JMenu();
+        jMenuItemNew = new javax.swing.JMenuItem();
+        jMenuItemOpen = new javax.swing.JMenuItem();
+        jMenuItemSave = new javax.swing.JMenuItem();
+        jMenuItemSaveAs = new javax.swing.JMenuItem();
+        jMenuItemClose = new javax.swing.JMenuItem();
+        jMenuItemExit = new javax.swing.JMenuItem();
+        jMenuAnalysis = new javax.swing.JMenu();
+        jMenuItemAnalyse = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lexical Syntactic Analyser LR");
-        setPreferredSize(new java.awt.Dimension(1280, 720));
+
+        jScrollPaneLines.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPaneLines.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
         jTextPaneLines.setEditable(false);
         jTextPaneLines.setFont(new java.awt.Font("Consolas", 0, 18)); // NOI18N
@@ -75,6 +93,37 @@ public class Window extends javax.swing.JFrame {
 
         jTabbedPaneOutput.addTab("Table", jScrollPaneTable);
 
+        jMenuFile.setText("File");
+
+        jMenuItemNew.setText("New");
+        jMenuFile.add(jMenuItemNew);
+
+        jMenuItemOpen.setText("Open...");
+        jMenuFile.add(jMenuItemOpen);
+
+        jMenuItemSave.setText("Save");
+        jMenuFile.add(jMenuItemSave);
+
+        jMenuItemSaveAs.setText("Save as...");
+        jMenuFile.add(jMenuItemSaveAs);
+
+        jMenuItemClose.setText("Close");
+        jMenuFile.add(jMenuItemClose);
+
+        jMenuItemExit.setText("Exit");
+        jMenuFile.add(jMenuItemExit);
+
+        jMenuBar.add(jMenuFile);
+
+        jMenuAnalysis.setText("Analysis");
+
+        jMenuItemAnalyse.setText("Analyse");
+        jMenuAnalysis.add(jMenuItemAnalyse);
+
+        jMenuBar.add(jMenuAnalysis);
+
+        setJMenuBar(jMenuBar);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -87,20 +136,59 @@ public class Window extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanelCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPaneOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
+                .addComponent(jTabbedPaneOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        new Window().setVisible(true);
+    private void initIDE(){
+        this.setLocationRelativeTo(null);
+        jScrollPaneCode.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                jScrollPaneLines.getVerticalScrollBar().setValue(jScrollPaneCode.getVerticalScrollBar().getValue());
+            }
+        });
+        updateLineCount();
+        addEvents();
     }
-
+    
+    private void addEvents(){
+        jTextPaneCode.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER | e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+                    updateLineCount();
+            }
+        });
+    }
+    
+    private void updateLineCount(){
+        int count = 1;
+        String lines = "1";
+        
+        for (char car : jTextPaneCode.getText().toCharArray()) {
+            if (car == '\n'){
+                count++;
+                lines += "\n" + count;
+            }
+        }
+        
+        jTextPaneLines.setText(lines);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu jMenuAnalysis;
+    private javax.swing.JMenuBar jMenuBar;
+    private javax.swing.JMenu jMenuFile;
+    private javax.swing.JMenuItem jMenuItemAnalyse;
+    private javax.swing.JMenuItem jMenuItemClose;
+    private javax.swing.JMenuItem jMenuItemExit;
+    private javax.swing.JMenuItem jMenuItemNew;
+    private javax.swing.JMenuItem jMenuItemOpen;
+    private javax.swing.JMenuItem jMenuItemSave;
+    private javax.swing.JMenuItem jMenuItemSaveAs;
     private javax.swing.JPanel jPanelCode;
     private javax.swing.JScrollPane jScrollPaneCode;
     private javax.swing.JScrollPane jScrollPaneLines;
