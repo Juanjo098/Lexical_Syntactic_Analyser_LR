@@ -1,9 +1,18 @@
 package graphicinterface;
 
+import filemanagment.CustomJFileChooser;
+import filemanagment.FileIO;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class Window extends javax.swing.JFrame {
 
@@ -142,42 +151,226 @@ public class Window extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void initIDE(){
+    private void initIDE() {
+        file = null;
+        io = new FileIO();
+        filechooser = new CustomJFileChooser();
         this.setLocationRelativeTo(null);
+        updateLineCount();
+        addEvents();
+    }
+
+    private void addEvents() {
         jScrollPaneCode.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 jScrollPaneLines.getVerticalScrollBar().setValue(jScrollPaneCode.getVerticalScrollBar().getValue());
             }
         });
-        updateLineCount();
-        addEvents();
-    }
-    
-    private void addEvents(){
         jTextPaneCode.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER | e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+                if (e.getKeyCode() == KeyEvent.VK_ENTER | e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
                     updateLineCount();
+                }
+                fileModified();
+            }
+        });
+        jMenuItemNew.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newFile();
+            }
+        });
+        jMenuItemOpen.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openFile();
+            }
+        });
+        jMenuItemSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (saveFile()) {
+                    updateFileTitle(file.getName());
+                }
+            }
+        });
+        jMenuItemSaveAs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (saveFileAs()) {
+                    updateFileTitle(file.getName());
+                }
+            }
+        });
+        jMenuItemClose.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                closeFile();
+            }
+        });
+        jMenuItemExit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                close();
+            }
+        });
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (saveBefore("close the program") != JOptionPane.CANCEL_OPTION)
+                    Window.this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                else
+                    Window.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             }
         });
     }
-    
-    private void updateLineCount(){
+
+    private void updateLineCount() {
         int count = 1;
         String lines = "1";
-        
+
         for (char car : jTextPaneCode.getText().toCharArray()) {
-            if (car == '\n'){
+            if (car == '\n') {
                 count++;
                 lines += "\n" + count;
             }
         }
-        
+
         jTextPaneLines.setText(lines);
     }
+
+    private void updateFileTitle(String title) {
+        this.setTitle(title);
+    }
+
+    private void validateExtension() {
+        if (!file.getAbsolutePath().endsWith(".sg")) {
+            file = new File(file.getAbsolutePath() + ".sg");
+        }
+    }
+
+    private void updateFileContent(String cont) {
+        jTextPaneCode.setText(cont);
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="File managment">
+    private void fileModified() {
+        if (this.getTitle().indexOf("*") == -1) {
+            this.setTitle("*" + this.getTitle());
+        }
+    }
+
+    private boolean isFileLoaded() {
+        return file != null;
+    }
+
+    private boolean getFileSaveState() {
+        if (this.getTitle().indexOf("*") == -1) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 0: No file open, no saved 1: File open, no saved 2: No file open, saved
+     * 3: File open, saved
+     *
+     * @return File save state
+     */
+    private byte getSaveState() {
+        byte state = 0;
+        if (isFileLoaded()) {
+            state += 1;
+        }
+        if (getFileSaveState()) {
+            state += 2;
+        }
+        return state;
+    }
+
+    private byte saveBefore(String action) {
+        switch (getSaveState()) {
+            case 0:
+            case 1:
+                switch (JOptionPane.showConfirmDialog(this, "Do you want to save the file before to " + action + "?",
+                        "Save before to " + action, JOptionPane.YES_NO_CANCEL_OPTION)) {
+                    case JOptionPane.YES_OPTION:
+                        if (saveFile()) {
+                            return JOptionPane.YES_OPTION;
+                        } else {
+                            return JOptionPane.CANCEL_OPTION;
+                        }
+                    case JOptionPane.NO_OPTION:
+                        return JOptionPane.NO_OPTION;
+                    case JOptionPane.CANCEL_OPTION:
+                        return JOptionPane.CANCEL_OPTION;
+                    case JOptionPane.CLOSED_OPTION:
+                        return JOptionPane.CANCEL_OPTION;
+                }
+        }
+        return JOptionPane.YES_OPTION;
+    }
+
+    private void newFile() {
+        if (saveBefore("create a new file") != JOptionPane.CANCEL_OPTION) {
+            if (saveFileAs()) {
+                updateFileTitle(file.getName());
+                updateFileContent("");
+                updateLineCount();
+            }
+        }
+    }
+
+    private void openFile() {
+        String text;
+        if (saveBefore("open a new file") != JOptionPane.CANCEL_OPTION) {
+            if (filechooser.showOpenDialog(this) == filechooser.APPROVE_OPTION) {
+                file = filechooser.getSelectedFile();
+                if ((text = io.readFile(file)) != null) {
+                    updateFileTitle(file.getName());
+                    updateFileContent(text);
+                    updateLineCount();
+                }
+            }
+        }
+    }
+
+    private boolean saveFile() {
+        if (isFileLoaded()) {
+            return io.writeFile(file, jTextPaneCode.getText());
+        } else {
+            return saveFileAs();
+        }
+    }
+
+    private boolean saveFileAs() {
+        if (filechooser.showSaveDialog(this) == filechooser.APPROVE_OPTION) {
+            file = filechooser.getSelectedFile();
+            validateExtension();
+            return io.writeFile(file, jTextPaneCode.getText());
+        }
+
+        return false;
+    }
     
+    private void close(){
+        if (saveBefore("close the program") != JOptionPane.CANCEL_OPTION){
+            System.exit(0);
+        }
+    }
+
+    private void closeFile() {
+        if (saveBefore("close the file") != JOptionPane.CANCEL_OPTION) {
+            file = null;
+            updateFileTitle(DEFAULD_WINDOW_TITLE);
+            updateFileContent("");
+            updateLineCount();
+        }
+    }
+
+    // </editor-fold>             
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenuAnalysis;
     private javax.swing.JMenuBar jMenuBar;
@@ -200,4 +393,8 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextPane jTextPaneLines;
     private javax.swing.JTextPane jTextPaneTerminal;
     // End of variables declaration//GEN-END:variables
+    private final String DEFAULD_WINDOW_TITLE = "Lexical Syntactic Analyser LR";
+    private File file;
+    private CustomJFileChooser filechooser;
+    private FileIO io;
 }
