@@ -46,9 +46,9 @@
             <Property name="text" type="java.lang.String" value="Analysis"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemAnalyse">
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemLexicAnalysis">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Analyse"/>
+                <Property name="text" type="java.lang.String" value="Lexical analysis"/>
               </Properties>
             </MenuItem>
           </SubComponents>

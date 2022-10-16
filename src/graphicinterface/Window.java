@@ -10,9 +10,18 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOError;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import lexicalanalysis.Lexer;
+import lexicalanalysis.Tokens;
 
 public class Window extends javax.swing.JFrame {
 
@@ -52,7 +61,7 @@ public class Window extends javax.swing.JFrame {
         jMenuItemClose = new javax.swing.JMenuItem();
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenuAnalysis = new javax.swing.JMenu();
-        jMenuItemAnalyse = new javax.swing.JMenuItem();
+        jMenuItemLexicAnalysis = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lexical Syntactic Analyser LR");
@@ -126,8 +135,8 @@ public class Window extends javax.swing.JFrame {
 
         jMenuAnalysis.setText("Analysis");
 
-        jMenuItemAnalyse.setText("Analyse");
-        jMenuAnalysis.add(jMenuItemAnalyse);
+        jMenuItemLexicAnalysis.setText("Lexical analysis");
+        jMenuAnalysis.add(jMenuItemLexicAnalysis);
 
         jMenuBar.add(jMenuAnalysis);
 
@@ -218,10 +227,47 @@ public class Window extends javax.swing.JFrame {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (saveBefore("close the program") != JOptionPane.CANCEL_OPTION)
+                if (saveBefore("close the program") != JOptionPane.CANCEL_OPTION) {
                     Window.this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                else
+                } else {
                     Window.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                }
+            }
+        });
+        jMenuItemLexicAnalysis.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!saveFile()) {
+                    return;
+                }
+
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(file));
+                    Lexer lexer = new Lexer(reader);
+                    Tokens token;
+                    int line = 1;
+                    String result = "";
+
+                    while (true) {
+                        token = lexer.yylex();
+                        
+                        if (token == Tokens.Linea){
+                            line++;
+                            continue;
+                        }
+                        
+                        if (token == null){
+                            result += "Linea " + line + ": " + "$ es el símbolo terminal";
+                            jTextPaneTerminal.setText(result);
+                            return;
+                        }
+                        
+                        result += "Linea " + line + ": " + lexer.yytext() + " es un " + token + "\n";             
+                    }
+
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
     }
@@ -353,9 +399,9 @@ public class Window extends javax.swing.JFrame {
 
         return false;
     }
-    
-    private void close(){
-        if (saveBefore("close the program") != JOptionPane.CANCEL_OPTION){
+
+    private void close() {
+        if (saveBefore("close the program") != JOptionPane.CANCEL_OPTION) {
             System.exit(0);
         }
     }
@@ -375,9 +421,9 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenu jMenuAnalysis;
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JMenu jMenuFile;
-    private javax.swing.JMenuItem jMenuItemAnalyse;
     private javax.swing.JMenuItem jMenuItemClose;
     private javax.swing.JMenuItem jMenuItemExit;
+    private javax.swing.JMenuItem jMenuItemLexicAnalysis;
     private javax.swing.JMenuItem jMenuItemNew;
     private javax.swing.JMenuItem jMenuItemOpen;
     private javax.swing.JMenuItem jMenuItemSave;

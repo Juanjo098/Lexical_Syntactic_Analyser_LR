@@ -1,5 +1,5 @@
 package lexicalanalysis;
-import static codigo.Tokens.*;
+import static lexicalanalysis.Tokens.*;
 %%
 %class Lexer
 %type Tokens
@@ -54,7 +54,7 @@ espacio=[ ,\t,\r]+
 {L}({L}|{D})* {lexeme=yytext(); return Identificador;}
 
 /* Numero */
-("(-"{D}+")")|{D}+ {lexeme=yytext(); return Entero;}
+(-?{D}+) {lexeme=yytext(); return Entero;}
 
 /* Flotante */
 (-?{D}+\.{D}+) {lexeme=yytext(); return Flotante;}
