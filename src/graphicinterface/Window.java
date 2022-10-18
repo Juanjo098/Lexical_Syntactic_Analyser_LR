@@ -2,6 +2,7 @@ package graphicinterface;
 
 import filemanagment.CustomJFileChooser;
 import filemanagment.FileIO;
+import filemanagment.ReadSpreadsheet;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -392,42 +393,42 @@ public class Window extends javax.swing.JFrame {
     }
     // </editor-fold>             
 
-    private void lexicalAnalysis(){
+    private void lexicalAnalysis() {
         if (!saveFile()) {
+            return;
+        }
+
+        updateFileTitle();
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            Lexer lexer = new Lexer(reader);
+            Tokens token;
+            int line = 1;
+            String result = "";
+
+            while (true) {
+                token = lexer.yylex();
+
+                if (token == Tokens.Linea) {
+                    line++;
+                    continue;
+                }
+
+                if (token == null) {
+                    result += "Linea " + line + ": " + "$ es el símbolo terminal";
+                    jTextPaneTerminal.setText(result);
                     return;
                 }
 
-                updateFileTitle();
+                result += "Linea " + line + ": " + lexer.yytext() + " es un " + token + "\n";
+            }
 
-                try {
-                    BufferedReader reader = new BufferedReader(new FileReader(file));
-                    Lexer lexer = new Lexer(reader);
-                    Tokens token;
-                    int line = 1;
-                    String result = "";
-
-                    while (true) {
-                        token = lexer.yylex();
-
-                        if (token == Tokens.Linea) {
-                            line++;
-                            continue;
-                        }
-
-                        if (token == null) {
-                            result += "Linea " + line + ": " + "$ es el símbolo terminal";
-                            jTextPaneTerminal.setText(result);
-                            return;
-                        }
-
-                        result += "Linea " + line + ": " + lexer.yytext() + " es un " + token + "\n";
-                    }
-
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
-                }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
+        }
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenuAnalysis;
     private javax.swing.JMenuBar jMenuBar;
@@ -451,6 +452,30 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextPane jTextPaneTerminal;
     // End of variables declaration//GEN-END:variables
     private final String DEFAULT_WINDOW_TITLE = "Lexical Syntactic Analyser LR";
+    private final String[] ELEMENTS = ReadSpreadsheet.ReadTable();
+    private final String[][] TABLE = ReadSpreadsheet.SpreadsheetTo2dArray();
+    private final String[] PRODUCTIONS = new String[]{
+        "P",
+        "Tipo id V",
+        "A",
+        "int",
+        "float",
+        "char",
+        "id V",
+        "; P",
+        "id = Exp ;",
+        "Term E",
+        "+ Term E",
+        "- Term E",
+        "",
+        "F T",
+        "* F T",
+        "/ F T",
+        "",
+        "id",
+        "( Exp )",
+        "num"
+    };
     private File file;
     private CustomJFileChooser filechooser;
     private FileIO io;
