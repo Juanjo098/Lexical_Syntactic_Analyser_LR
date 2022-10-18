@@ -201,7 +201,7 @@ public class Window extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (saveFile()) {
-                    updateFileTitle(file.getName());
+                    updateFileTitle();
                 }
             }
         });
@@ -209,7 +209,7 @@ public class Window extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (saveFileAs()) {
-                    updateFileTitle(file.getName());
+                    updateFileTitle();
                 }
             }
         });
@@ -241,6 +241,8 @@ public class Window extends javax.swing.JFrame {
                     return;
                 }
 
+                updateFileTitle();
+
                 try {
                     BufferedReader reader = new BufferedReader(new FileReader(file));
                     Lexer lexer = new Lexer(reader);
@@ -250,19 +252,19 @@ public class Window extends javax.swing.JFrame {
 
                     while (true) {
                         token = lexer.yylex();
-                        
-                        if (token == Tokens.Linea){
+
+                        if (token == Tokens.Linea) {
                             line++;
                             continue;
                         }
-                        
-                        if (token == null){
+
+                        if (token == null) {
                             result += "Linea " + line + ": " + "$ es el símbolo terminal";
                             jTextPaneTerminal.setText(result);
                             return;
                         }
-                        
-                        result += "Linea " + line + ": " + lexer.yytext() + " es un " + token + "\n";             
+
+                        result += "Linea " + line + ": " + lexer.yytext() + " es un " + token + "\n";
                     }
 
                 } catch (IOException ex) {
@@ -286,8 +288,8 @@ public class Window extends javax.swing.JFrame {
         jTextPaneLines.setText(lines);
     }
 
-    private void updateFileTitle(String title) {
-        this.setTitle(title);
+    private void updateFileTitle() {
+        this.setTitle(file.getName());
     }
 
     private void validateExtension() {
@@ -361,7 +363,7 @@ public class Window extends javax.swing.JFrame {
     private void newFile() {
         if (saveBefore("create a new file") != JOptionPane.CANCEL_OPTION) {
             if (saveFileAs()) {
-                updateFileTitle(file.getName());
+                updateFileTitle();
                 updateFileContent("");
                 updateLineCount();
             }
@@ -374,7 +376,7 @@ public class Window extends javax.swing.JFrame {
             if (filechooser.showOpenDialog(this) == filechooser.APPROVE_OPTION) {
                 file = filechooser.getSelectedFile();
                 if ((text = io.readFile(file)) != null) {
-                    updateFileTitle(file.getName());
+                    updateFileTitle();
                     updateFileContent(text);
                     updateLineCount();
                 }
@@ -409,12 +411,11 @@ public class Window extends javax.swing.JFrame {
     private void closeFile() {
         if (saveBefore("close the file") != JOptionPane.CANCEL_OPTION) {
             file = null;
-            updateFileTitle(DEFAULD_WINDOW_TITLE);
+            this.setTitle(DEFAULT_WINDOW_TITLE);
             updateFileContent("");
             updateLineCount();
         }
     }
-
     // </editor-fold>             
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -439,7 +440,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextPane jTextPaneLines;
     private javax.swing.JTextPane jTextPaneTerminal;
     // End of variables declaration//GEN-END:variables
-    private final String DEFAULD_WINDOW_TITLE = "Lexical Syntactic Analyser LR";
+    private final String DEFAULT_WINDOW_TITLE = "Lexical Syntactic Analyser LR";
     private File file;
     private CustomJFileChooser filechooser;
     private FileIO io;
