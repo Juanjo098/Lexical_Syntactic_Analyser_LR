@@ -160,6 +160,7 @@ public class Window extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //<editor-fold defaultstate="collapsed" desc="IDE inicialization">
     private void initIDE() {
         file = null;
         io = new FileIO();
@@ -168,7 +169,9 @@ public class Window extends javax.swing.JFrame {
         updateLineCount();
         addEvents();
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="Events">
     private void addEvents() {
         jScrollPaneCode.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
@@ -237,43 +240,13 @@ public class Window extends javax.swing.JFrame {
         jMenuItemLexicAnalysis.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!saveFile()) {
-                    return;
-                }
-
-                updateFileTitle();
-
-                try {
-                    BufferedReader reader = new BufferedReader(new FileReader(file));
-                    Lexer lexer = new Lexer(reader);
-                    Tokens token;
-                    int line = 1;
-                    String result = "";
-
-                    while (true) {
-                        token = lexer.yylex();
-
-                        if (token == Tokens.Linea) {
-                            line++;
-                            continue;
-                        }
-
-                        if (token == null) {
-                            result += "Linea " + line + ": " + "$ es el símbolo terminal";
-                            jTextPaneTerminal.setText(result);
-                            return;
-                        }
-
-                        result += "Linea " + line + ": " + lexer.yytext() + " es un " + token + "\n";
-                    }
-
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
-                }
+                lexicalAnalysis();
             }
         });
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="User experience">
     private void updateLineCount() {
         int count = 1;
         String lines = "1";
@@ -301,6 +274,7 @@ public class Window extends javax.swing.JFrame {
     private void updateFileContent(String cont) {
         jTextPaneCode.setText(cont);
     }
+    //</editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="File managment">
     private void fileModified() {
@@ -418,6 +392,42 @@ public class Window extends javax.swing.JFrame {
     }
     // </editor-fold>             
 
+    private void lexicalAnalysis(){
+        if (!saveFile()) {
+                    return;
+                }
+
+                updateFileTitle();
+
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(file));
+                    Lexer lexer = new Lexer(reader);
+                    Tokens token;
+                    int line = 1;
+                    String result = "";
+
+                    while (true) {
+                        token = lexer.yylex();
+
+                        if (token == Tokens.Linea) {
+                            line++;
+                            continue;
+                        }
+
+                        if (token == null) {
+                            result += "Linea " + line + ": " + "$ es el símbolo terminal";
+                            jTextPaneTerminal.setText(result);
+                            return;
+                        }
+
+                        result += "Linea " + line + ": " + lexer.yytext() + " es un " + token + "\n";
+                    }
+
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
+                }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenuAnalysis;
     private javax.swing.JMenuBar jMenuBar;
