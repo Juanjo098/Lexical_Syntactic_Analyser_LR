@@ -42,54 +42,53 @@ public class SyntacticAnalyzer {
     }
 
     public void syntacticAnalysis(Component c) {
-        try {
-            
+        while (true) {
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
-            
-            showStack();
-            
-            row = getRowIndex();
-            column = getColumnIndex(c.getToken());
-            cell = TABLE[row][column];
+                showStack();
 
-            if (cell == "") {
-                error = "Error sintactico";
-                return;
-            }
-            
-            if (cell.startsWith("r")) {
-                cell = cell.substring(1, cell.length());
-                int pro = Integer.parseInt(cell);
-                int elements, tope;
+                row = getRowIndex();
+                column = getColumnIndex(c.getToken());
+                cell = TABLE[row][column];
+
+                if (cell == "") {
+                    error = "Error sintactico";
+                    return;
+                }
                 
-                StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
-                elements = st.countTokens();
-
-                if (elements == 1 && st.nextToken().equals("")) {
-                    elements = 0;
+                if (cell.equals("acc")) {
+                    return;
                 }
 
-                popStack(elements);
-                tope = Integer.parseInt(stack.peek());
+                if (cell.startsWith("r")) {
+                    cell = cell.substring(1, cell.length());
+                    int pro = Integer.parseInt(cell);
+                    int elements, tope;
 
-                stack.add(NO_TERMINALS[pro]);
-                stack.add(TABLE[tope][getColumnIndex(NO_TERMINALS[pro])]);
+                    StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
+                    elements = st.countTokens();
 
-                syntacticAnalysis(c);
-                return;
+                    if (elements == 1 && st.nextToken().equals("")) {
+                        elements = 0;
+                    }
+
+                    popStack(elements);
+                    tope = Integer.parseInt(stack.peek());
+
+                    stack.add(NO_TERMINALS[pro]);
+                    stack.add(TABLE[tope][getColumnIndex(NO_TERMINALS[pro])]);
+                    
+                    continue;
+                }
+
+                if (cell.startsWith("s")) {
+                    stack.add(c.getToken());
+                    stack.add(cell.substring(1, cell.length()));
+                    return;
+                }
+
+            } catch (ArrayIndexOutOfBoundsException e) {
+                error = "Error sintactico";
             }
-
-            if (cell.startsWith("s")) {
-                stack.add(c.getToken());
-                stack.add(cell.substring(1, cell.length()));
-                return;
-            }
-
-        } catch (ArrayIndexOutOfBoundsException e) {
-            error = "Error sintactico";
         }
     }
 
@@ -121,7 +120,7 @@ public class SyntacticAnalyzer {
     }
 
     private void showStack() {
-        System.out.print ("Pila: ");
+        System.out.print("Pila: ");
         for (String string : stack) {
             System.out.print(string + " ");
         }

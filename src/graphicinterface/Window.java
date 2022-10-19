@@ -512,7 +512,7 @@ public class Window extends javax.swing.JFrame {
                 token = lexer.yylex();
                 
                 if (analyzer.isError()){
-                    result = analyzer.getError();
+                    jTextPaneTerminal.setText(analyzer.getError());
                     return;
                 }
                 
