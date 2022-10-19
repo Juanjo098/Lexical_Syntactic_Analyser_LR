@@ -51,6 +51,16 @@
                 <Property name="text" type="java.lang.String" value="Lexical analysis"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemLexicalOutput">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Lexical output"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemsSntacticAnalysis">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Syntactic analysis"/>
+              </Properties>
+            </MenuItem>
           </SubComponents>
         </Menu>
       </SubComponents>

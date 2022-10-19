@@ -63,6 +63,8 @@ public class Window extends javax.swing.JFrame {
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenuAnalysis = new javax.swing.JMenu();
         jMenuItemLexicAnalysis = new javax.swing.JMenuItem();
+        jMenuItemLexicalOutput = new javax.swing.JMenuItem();
+        jMenuItemsSntacticAnalysis = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lexical Syntactic Analyser LR");
@@ -138,6 +140,12 @@ public class Window extends javax.swing.JFrame {
 
         jMenuItemLexicAnalysis.setText("Lexical analysis");
         jMenuAnalysis.add(jMenuItemLexicAnalysis);
+
+        jMenuItemLexicalOutput.setText("Lexical output");
+        jMenuAnalysis.add(jMenuItemLexicalOutput);
+
+        jMenuItemsSntacticAnalysis.setText("Syntactic analysis");
+        jMenuAnalysis.add(jMenuItemsSntacticAnalysis);
 
         jMenuBar.add(jMenuAnalysis);
 
@@ -436,10 +444,12 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemClose;
     private javax.swing.JMenuItem jMenuItemExit;
     private javax.swing.JMenuItem jMenuItemLexicAnalysis;
+    private javax.swing.JMenuItem jMenuItemLexicalOutput;
     private javax.swing.JMenuItem jMenuItemNew;
     private javax.swing.JMenuItem jMenuItemOpen;
     private javax.swing.JMenuItem jMenuItemSave;
     private javax.swing.JMenuItem jMenuItemSaveAs;
+    private javax.swing.JMenuItem jMenuItemsSntacticAnalysis;
     private javax.swing.JPanel jPanelCode;
     private javax.swing.JScrollPane jScrollPaneCode;
     private javax.swing.JScrollPane jScrollPaneLines;
