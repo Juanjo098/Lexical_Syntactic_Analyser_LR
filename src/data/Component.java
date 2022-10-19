@@ -4,13 +4,12 @@ import lexicalanalysis.Tokens;
 
 public class Component {
     private int line;
-    private Tokens type;
-    private String token;
+    private String name, token;
     private Object value;
 
-    public Component(int line, Tokens type, String token, Object value) {
+    public Component(int line, String name, String token, Object value) {
         this.line = line;
-        this.type = type;
+        this.name = name;
         this.token = token;
         this.value = value;
     }
@@ -19,8 +18,8 @@ public class Component {
         return line;
     }
 
-    public Tokens getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
     public String getToken() {
@@ -30,4 +29,5 @@ public class Component {
     public Object getValue() {
         return value;
     }
+    
 }

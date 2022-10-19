@@ -2,7 +2,8 @@ package graphicinterface;
 
 import filemanagment.CustomJFileChooser;
 import filemanagment.FileIO;
-import filemanagment.ReadSpreadsheet;
+import data.Component;
+import syntacticanalyzer.SyntacticAnalyzer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -13,12 +14,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOError;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import lexicalanalysis.Lexer;
@@ -252,6 +249,18 @@ public class Window extends javax.swing.JFrame {
                 lexicalAnalysis();
             }
         });
+        jMenuItemLexicalOutput.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                lexicalOutput();
+            }
+        });
+        jMenuItemsSntacticAnalysis.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                syntacticAnalysis();
+            }
+        });
     }
     //</editor-fold>
 
@@ -437,6 +446,125 @@ public class Window extends javax.swing.JFrame {
         }
     }
 
+    private void lexicalOutput() {
+        if (!saveFile()) {
+            return;
+        }
+
+        updateFileTitle();
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            Lexer lexer = new Lexer(reader);
+            Tokens token;
+            Component component;
+            int line = 1;
+            String result = "", text;
+
+            while (true) {
+                token = lexer.yylex();
+
+                if (token == Tokens.Linea) {
+                    line++;
+                    result += "\n";
+                    continue;
+                }
+                
+                if (token == Tokens.ERROR){
+                    result = "Error lexico en la linea " + line + ": " + lexer.yytext() + " no es valido";
+                    return;
+                }
+
+                if (token == null) {
+                    result += " $";
+                    jTextPaneTerminal.setText(result);
+                    return;
+                }
+
+                text = getSyntacticEntrance(token, lexer.yytext());
+                component = new Component(line, lexer.yytext(), text, null);
+                
+                result += component.getToken() + " ";
+            }
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void syntacticAnalysis() {
+        if (!saveFile()) {
+            return;
+        }
+
+        updateFileTitle();
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            Lexer lexer = new Lexer(reader);
+            Tokens token;
+            Component component;
+            SyntacticAnalyzer analyzer = new SyntacticAnalyzer();
+            int line = 1;
+            String result = "", text;
+
+            while (true) {
+                token = lexer.yylex();
+                
+                if (analyzer.isError()){
+                    result = analyzer.getError();
+                    return;
+                }
+                
+                if (token == Tokens.Linea) {
+                    line++;
+                    result += "\n";
+                    continue;
+                }
+                
+                if (token == Tokens.ERROR){
+                    result = "Error lexico en la linea " + line + ": " + lexer.yytext() + " no es valido";
+                    return;
+                }
+
+                if (token == null) {
+                    return;
+                }
+
+                text = getSyntacticEntrance(token, lexer.yytext());
+                component = new Component(line, lexer.yytext(), text, null);
+                
+                analyzer.syntacticAnalysis(component);
+                
+            }
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private String getSyntacticEntrance(Tokens t, String text) {
+        switch (t) {
+            case T_Dato:
+            case Suma:
+            case Resta:
+            case Multiplicacion:
+            case Division:
+            case Igual:
+            case Parentesis_a:
+            case Parentesis_c:
+            case Coma:
+            case P_coma:
+                return text;
+            case Identificador:
+                return "id";
+            case Entero:
+            case Flotante:
+                return "num";
+        }
+        return null;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenuAnalysis;
     private javax.swing.JMenuBar jMenuBar;
@@ -462,30 +590,6 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextPane jTextPaneTerminal;
     // End of variables declaration//GEN-END:variables
     private final String DEFAULT_WINDOW_TITLE = "Lexical Syntactic Analyser LR";
-    private final String[] ELEMENTS = ReadSpreadsheet.ReadTable();
-    private final String[][] TABLE = ReadSpreadsheet.SpreadsheetTo2dArray();
-    private final String[] PRODUCTIONS = new String[]{
-        "P",
-        "Tipo id V",
-        "A",
-        "int",
-        "float",
-        "char",
-        "id V",
-        "; P",
-        "id = Exp ;",
-        "Term E",
-        "+ Term E",
-        "- Term E",
-        "",
-        "F T",
-        "* F T",
-        "/ F T",
-        "",
-        "id",
-        "( Exp )",
-        "num"
-    };
     private File file;
     private CustomJFileChooser filechooser;
     private FileIO io;

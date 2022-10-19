@@ -10,9 +10,7 @@ package lexicalanalysis;
  */
 public enum Tokens {
     Linea,
-    Int,
-    Float,
-    Char,
+    T_Dato,
     Igual,
     Suma,
     Resta,

@@ -21,13 +21,7 @@ espacio=[ ,\t,\r]+
 ( "\n" ) {return Linea;}
 
 /* Tipos de datos */
-( int ) {lexeme=yytext(); return Int;}
-
-/* Tipos de datos */
-( float ) {lexeme=yytext(); return Float;}
-
-/* Tipos de datos */
-( char ) {lexeme=yytext(); return Char;}
+( int | float | char ) {lexeme=yytext(); return T_Dato;}
 
 /* Operador Igual */
 ( "=" ) {lexeme=yytext(); return Igual;}
