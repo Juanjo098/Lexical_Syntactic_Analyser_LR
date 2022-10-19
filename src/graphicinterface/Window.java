@@ -528,6 +528,8 @@ public class Window extends javax.swing.JFrame {
                 }
 
                 if (token == null) {
+                    component = new Component(line, "$", "$", null);
+                    analyzer.syntacticAnalysis(component);
                     return;
                 }
 

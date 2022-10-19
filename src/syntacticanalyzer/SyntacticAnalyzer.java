@@ -43,6 +43,14 @@ public class SyntacticAnalyzer {
 
     public void syntacticAnalysis(Component c) {
         try {
+            
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+            
+            showStack();
+            
             row = getRowIndex();
             column = getColumnIndex(c.getToken());
             cell = TABLE[row][column];
@@ -51,15 +59,11 @@ public class SyntacticAnalyzer {
                 error = "Error sintactico";
                 return;
             }
-
+            
             if (cell.startsWith("r")) {
                 cell = cell.substring(1, cell.length());
                 int pro = Integer.parseInt(cell);
                 int elements, tope;
-                
-                System.out.println("Entrada " + c.getToken());
-                System.out.println("Reducir " + NO_TERMINALS[pro] + " " + PRODUCTIONS[pro]);
-                showStack();
                 
                 StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
                 elements = st.countTokens();
@@ -75,12 +79,10 @@ public class SyntacticAnalyzer {
                 stack.add(TABLE[tope][getColumnIndex(NO_TERMINALS[pro])]);
 
                 syntacticAnalysis(c);
+                return;
             }
 
             if (cell.startsWith("s")) {
-                System.out.println("Desplazar");
-                System.out.println("Entrada " + c.getToken());
-                showStack();
                 stack.add(c.getToken());
                 stack.add(cell.substring(1, cell.length()));
                 return;
@@ -112,14 +114,6 @@ public class SyntacticAnalyzer {
         return Integer.parseInt(stack.peek());
     }
 
-    private Stack<String> fillStack(StringTokenizer st) {
-        Stack<String> tmp = new Stack<>();
-        do {
-            tmp.push(st.nextToken());
-        } while (st.hasMoreTokens());
-        return tmp;
-    }
-
     private void popStack(int pops) {
         for (int i = 0; i < (pops * 2); i++) {
             stack.pop();
@@ -127,6 +121,7 @@ public class SyntacticAnalyzer {
     }
 
     private void showStack() {
+        System.out.print ("Pila: ");
         for (String string : stack) {
             System.out.print(string + " ");
         }
