@@ -49,7 +49,7 @@ public class Window extends javax.swing.JFrame {
         jScrollPaneTerminal = new javax.swing.JScrollPane();
         jTextPaneTerminal = new javax.swing.JTextPane();
         jScrollPaneTable = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTableAnalysis = new javax.swing.JTable();
         jMenuBar = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuItemNew = new javax.swing.JMenuItem();
@@ -96,7 +96,7 @@ public class Window extends javax.swing.JFrame {
 
         jTabbedPaneOutput.addTab("Terminal", jScrollPaneTerminal);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableAnalysis.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -107,7 +107,7 @@ public class Window extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPaneTable.setViewportView(jTable1);
+        jScrollPaneTable.setViewportView(jTableAnalysis);
 
         jTabbedPaneOutput.addTab("Table", jScrollPaneTable);
 
@@ -530,6 +530,7 @@ public class Window extends javax.swing.JFrame {
                 if (token == null) {
                     component = new Component(line, "$", "$", null);
                     analyzer.syntacticAnalysis(component);
+                    jTableAnalysis.setModel(new CustomTableModel(analyzer.getStackReg(),analyzer.getInput(), analyzer.getAction()));
                     return;
                 }
 
@@ -586,7 +587,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPaneTable;
     private javax.swing.JScrollPane jScrollPaneTerminal;
     private javax.swing.JTabbedPane jTabbedPaneOutput;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTableAnalysis;
     private javax.swing.JTextPane jTextPaneCode;
     private javax.swing.JTextPane jTextPaneLines;
     private javax.swing.JTextPane jTextPaneTerminal;

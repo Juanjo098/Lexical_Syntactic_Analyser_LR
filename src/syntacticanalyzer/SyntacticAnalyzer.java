@@ -5,8 +5,21 @@ import filemanagment.ReadSpreadsheet;
 import java.util.Stack;
 import data.Component;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 public class SyntacticAnalyzer {
+
+    public Vector<String> getStackReg() {
+        return stackReg;
+    }
+
+    public Vector<String> getInput() {
+        return input;
+    }
+
+    public Vector<String> getAction() {
+        return action;
+    }
 
     private final String[][] TABLE = ReadSpreadsheet.SpreadsheetTo2dArray();
     private final String[] ELEMENTS = ReadSpreadsheet.ReadTable();
@@ -79,13 +92,15 @@ public class SyntacticAnalyzer {
     private int row, column;
 
     private String error, cell;
-    private Stack<String> stack, input, actions;
+    private Stack<String> stack;
+    private Vector<String> stackReg, input, action;
 
     public SyntacticAnalyzer() {
         stack = new Stack<>();
         stack.add("0");
-        input = new Stack<>();
-        actions = new Stack<>();
+        stackReg = new Vector<>();
+        input = new Vector<>();
+        action = new Vector<>();
     }
 
     private void print2dArray(String[][] array) {
@@ -107,19 +122,22 @@ public class SyntacticAnalyzer {
     public void syntacticAnalysis(Component c) {
         while (true) {
             try {
-                showStack();
 
                 row = getRowIndex();
                 column = getColumnIndex(c.getToken());
                 cell = TABLE[row][column];
+                
+                stackReg.add(getStackStatus());
+                input.add(c.getToken());
 
                 if (cell == "") {
-                    System.out.println("Error " + row);
+                    action.add("ERROR");
                     error = getErrorMessage(row, c);
                     return;
                 }
 
                 if (cell.equals("acc")) {
+                    action.add("Aceptado");
                     return;
                 }
 
@@ -128,6 +146,8 @@ public class SyntacticAnalyzer {
                     int pro = Integer.parseInt(cell);
                     int elements, tope;
 
+                    action.add("Reducir " + NO_TERMINALS[pro] + " -> " + PRODUCTIONS[pro]);
+                    
                     StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
                     elements = st.countTokens();
 
@@ -145,8 +165,10 @@ public class SyntacticAnalyzer {
                 }
 
                 if (cell.startsWith("s")) {
+                    cell = cell.substring(1, cell.length());
+                    action.add("Desplazar: " + c.getToken() + " " + cell);
                     stack.add(c.getToken());
-                    stack.add(cell.substring(1, cell.length()));
+                    stack.add(cell);
                     return;
                 }
 
@@ -183,6 +205,9 @@ public class SyntacticAnalyzer {
         }
     }
 
+    /**
+     * @deprecated
+     */
     private void showStack() {
         System.out.print("Pila: ");
         for (String string : stack) {
@@ -193,5 +218,14 @@ public class SyntacticAnalyzer {
 
     private String getErrorMessage(int state, Component c) {
         return "Error sintáctico en la linea: " + c.getLine() + ". Se esperaba un: " + ERROR_MESSAGES[state];
+    }
+    
+    private String getStackStatus(){
+        String text = "";
+        
+        for (String string : stack)
+            text += string + " ";
+        
+        return text;
     }
 }
