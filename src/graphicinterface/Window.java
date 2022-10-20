@@ -246,18 +246,21 @@ public class Window extends javax.swing.JFrame {
         jMenuItemLexicAnalysis.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                clearTerminal();
                 lexicalAnalysis();
             }
         });
         jMenuItemLexicalOutput.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                clearTerminal();
                 lexicalOutput();
             }
         });
         jMenuItemsSntacticAnalysis.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                clearTerminal();
                 syntacticAnalysis();
             }
         });
@@ -463,7 +466,7 @@ public class Window extends javax.swing.JFrame {
 
             while (true) {
                 token = lexer.yylex();
-
+                
                 if (token == Tokens.Linea) {
                     line++;
                     result += "\n";
@@ -506,24 +509,25 @@ public class Window extends javax.swing.JFrame {
             Component component;
             SyntacticAnalyzer analyzer = new SyntacticAnalyzer();
             int line = 1;
-            String result = "", text;
+            String text;
 
             while (true) {
                 token = lexer.yylex();
                 
                 if (analyzer.isError()){
                     jTextPaneTerminal.setText(analyzer.getError());
+                    jTableAnalysis.setModel(new CustomTableModel(analyzer.getStackReg(),analyzer.getInput(), analyzer.getAction()));
                     return;
                 }
                 
                 if (token == Tokens.Linea) {
                     line++;
-                    result += "\n";
                     continue;
                 }
                 
                 if (token == Tokens.ERROR){
-                    result = "Error lexico en la linea " + line + ": " + lexer.yytext() + " no es valido";
+                    jTableAnalysis.setModel(new CustomTableModel(analyzer.getStackReg(),analyzer.getInput(), analyzer.getAction()));
+                    jTextPaneTerminal.setText("Error lexico en la linea " + line + ": " + lexer.yytext() + " no es valido");
                     return;
                 }
 
@@ -566,6 +570,10 @@ public class Window extends javax.swing.JFrame {
                 return "num";
         }
         return null;
+    }
+    
+    private void clearTerminal(){
+        jTextPaneTerminal.setText("");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

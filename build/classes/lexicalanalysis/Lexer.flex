@@ -5,14 +5,14 @@ import static lexicalanalysis.Tokens.*;
 %type Tokens
 L=[a-zA-Z_]+
 D=[0-9]+
-espacio=[ ,\t,\r]+
+espacio=[ \t\r]
 %{
     public String lexeme;
 %}
 %%
 
 /* Espacios en blanco */
-{espacio} {/*Ignore*/}
+{espacio}+ {/*Ignore*/}
 
 /* Comentarios */
 ( "//"(.)* ) {/*Ignore*/}
@@ -45,7 +45,7 @@ espacio=[ ,\t,\r]+
 ( ")" ) {lexeme=yytext(); return Parentesis_c;}
 
 /* Coma */
-( "," ) {lexeme=yytext(); return Coma;}
+( "\," ) {lexeme=yytext(); return Coma;}
 
 /* Punto y coma */
 ( ";" ) {lexeme=yytext(); return P_coma;}

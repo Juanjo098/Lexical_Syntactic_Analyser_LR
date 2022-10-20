@@ -130,7 +130,7 @@ public class SyntacticAnalyzer {
                 stackReg.add(getStackStatus());
                 input.add(c.getToken());
 
-                if (cell == "") {
+                if (cell.equals("")) {
                     action.add("ERROR");
                     error = getErrorMessage(row, c);
                     return;
