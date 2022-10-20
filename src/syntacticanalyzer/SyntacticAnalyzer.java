@@ -12,6 +12,69 @@ public class SyntacticAnalyzer {
     private final String[] ELEMENTS = ReadSpreadsheet.ReadTable();
     private final String[] PRODUCTIONS = ReadSpreadsheet.Productions();
     private final String[] NO_TERMINALS = ReadSpreadsheet.NoTerminals();
+    // <editor-fold defaultstate="collapsed" desc="Error Messages">      
+    private final String[] ERROR_MESSAGES = new String[]{
+        "id, int, float, char",
+        "",
+        "id",
+        "",
+        "id",
+        "id",
+        "id",
+        "=",
+        ",, ;",
+        "id, (, num",
+        "",
+        "id",
+        "id, int, float",
+        ";",
+        ";, +, -",
+        ";, +, -, *, /",
+        ";, +, -, *, /",
+        "id, (, num",
+        ";, +, -, *, /",
+        ",, ;",
+        "",
+        "",
+        ";",
+        "id, (, num",
+        "id, (, num",
+        ";, +, -",
+        "id, (, num",
+        "id, (, num",
+        ")",
+        "+, -, )",
+        "+, -, *, /, )",
+        "+, -, *, /, )",
+        "id, (, num",
+        "+, -, *, /, )",
+        "",
+        ";, +, -",
+        ";, +, -",
+        ";, +, -, *, /",
+        ";, +, -, *, /",
+        ";, +, -, *, /",
+        ")",
+        "id, (, num",
+        "id, (, num",
+        "+, -, )",
+        "id, (, num",
+        "id, (, num",
+        ")",
+        ";",
+        ";",
+        ";, +, -",
+        ";, +, -",
+        "+, -, )",
+        "+, -, )",
+        "+, -, *, /, )",
+        "+, -, *, /, ",
+        "+, -, *, /, ",
+        ")",
+        ")",
+        "+, -, )",
+        "+, -, )",};
+    // </editor-fold>
 
     private int row, column;
 
@@ -51,10 +114,11 @@ public class SyntacticAnalyzer {
                 cell = TABLE[row][column];
 
                 if (cell == "") {
-                    error = "Error sintactico";
+                    System.out.println("Error " + row);
+                    error = getErrorMessage(row, c);
                     return;
                 }
-                
+
                 if (cell.equals("acc")) {
                     return;
                 }
@@ -76,7 +140,7 @@ public class SyntacticAnalyzer {
 
                     stack.add(NO_TERMINALS[pro]);
                     stack.add(TABLE[tope][getColumnIndex(NO_TERMINALS[pro])]);
-                    
+
                     continue;
                 }
 
@@ -125,5 +189,9 @@ public class SyntacticAnalyzer {
             System.out.print(string + " ");
         }
         System.out.println("");
+    }
+
+    private String getErrorMessage(int state, Component c) {
+        return "Error sintáctico en la linea: " + c.getLine() + ". Se esperaba un: " + ERROR_MESSAGES[state];
     }
 }
