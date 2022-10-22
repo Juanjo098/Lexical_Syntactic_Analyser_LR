@@ -22,6 +22,12 @@ import lexicalanalysis.Lexer;
 import lexicalanalysis.Tokens;
 import semanticanalysis.SemanticAnalysis;
 
+/**
+ * Clase de la interfaz gráfica del compilador.
+ *
+ * @author Juan José Silva López
+ * @version 1.0
+ */
 public class Window extends javax.swing.JFrame {
 
     /**
@@ -168,6 +174,9 @@ public class Window extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     //<editor-fold defaultstate="collapsed" desc="IDE inicialization">
+    /**
+     * Inicializa los comonentes personalizados de la interfaz gráfica.
+     */
     private void initIDE() {
         file = null;
         io = new FileIO();
@@ -179,6 +188,9 @@ public class Window extends javax.swing.JFrame {
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Events">
+    /**
+     * A?ade los eventos a las scrollbars y a los menus.
+     */
     private void addEvents() {
         jScrollPaneCode.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
@@ -269,6 +281,9 @@ public class Window extends javax.swing.JFrame {
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="User experience">
+    /**
+     * Actualiza el número del contador de líneas.
+     */
     private void updateLineCount() {
         int count = 1;
         String lines = "1";
@@ -283,32 +298,57 @@ public class Window extends javax.swing.JFrame {
         jTextPaneLines.setText(lines);
     }
 
+    /**
+     * Actualiza el título del archivo.
+     */
     private void updateFileTitle() {
         this.setTitle(file.getName());
     }
 
+    /**
+     * Valida que el archivo a guardar tenga la extención ".sg".
+     */
     private void validateExtension() {
         if (!file.getAbsolutePath().endsWith(".sg")) {
             file = new File(file.getAbsolutePath() + ".sg");
         }
     }
 
+    /**
+     * Muestra en pantalla el contenido del archivo.
+     *
+     * @param cont
+     */
     private void updateFileContent(String cont) {
         jTextPaneCode.setText(cont);
     }
     //</editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="File managment">
+    /**
+     * Determina si el archivo ha sido modificados desde que se abrió.
+     */
     private void fileModified() {
         if (this.getTitle().indexOf("*") == -1) {
             this.setTitle("*" + this.getTitle());
         }
     }
 
+    /**
+     * Determina si hay un archivo abierto.
+     *
+     * @return true: si hay un archivo | false: si no hay un archivo abierto.
+     */
     private boolean isFileLoaded() {
         return file != null;
     }
 
+    /**
+     * Determina si un archivo está guardado o no.
+     *
+     * @return true: si el archivo está guardado | false: si el archivo no está
+     * guardado
+     */
     private boolean getFileSaveState() {
         if (this.getTitle().indexOf("*") == -1) {
             return true;
@@ -317,10 +357,12 @@ public class Window extends javax.swing.JFrame {
     }
 
     /**
-     * 0: No file open, no saved 1: File open, no saved 2: No file open, saved
-     * 3: File open, saved
+     * Determina el estado de guardado del archivo 0: no hay un archivo abierto
+     * y no ha sido guardado 1: hay un archivo abierto que no se ha guardado 2:
+     * no hay un archivo abierto y ha sido guardado 3: hay un archivo abierto y
+     * ha sido guardado
      *
-     * @return File save state
+     * @return Estado de guardado
      */
     private byte getSaveState() {
         byte state = 0;
@@ -333,6 +375,13 @@ public class Window extends javax.swing.JFrame {
         return state;
     }
 
+    /**
+     * Guarda el archivo o no antes de realizar una accion.
+     *
+     * @param action Accción a realizar
+     * @return 0: se gurda el archivo | 1: no se guarda el archivo | 3: no se
+     * realiza la acción
+     */
     private byte saveBefore(String action) {
         switch (getSaveState()) {
             case 0:
@@ -356,16 +405,20 @@ public class Window extends javax.swing.JFrame {
         return JOptionPane.YES_OPTION;
     }
 
+    /**
+     * Crea un nuevo archivo.
+     */
     private void newFile() {
-        if (saveBefore("create a new file") != JOptionPane.CANCEL_OPTION) {
-            if (saveFileAs()) {
-                updateFileTitle();
-                updateFileContent("");
-                updateLineCount();
-            }
+        if (saveBefore("create a new file") != JOptionPane.CANCEL_OPTION && saveFileAs()) {
+            updateFileTitle();
+            updateFileContent("");
+            updateLineCount();
         }
     }
 
+    /**
+     * Abre un archivo.
+     */
     private void openFile() {
         String text;
         if (saveBefore("open a new file") != JOptionPane.CANCEL_OPTION) {
@@ -380,6 +433,10 @@ public class Window extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Guarda el archivo.
+     * @return true: si el archivo se guardó | false: si el archivo no se guardó.
+     */
     private boolean saveFile() {
         if (isFileLoaded()) {
             return io.writeFile(file, jTextPaneCode.getText());
@@ -388,6 +445,10 @@ public class Window extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Guarda el archivo con otro nombre.
+     * @return true: si el archivo se guardó | false: si el archivo no se guardó.
+     */
     private boolean saveFileAs() {
         if (filechooser.showSaveDialog(this) == filechooser.APPROVE_OPTION) {
             file = filechooser.getSelectedFile();
@@ -398,12 +459,18 @@ public class Window extends javax.swing.JFrame {
         return false;
     }
 
+    /**
+     * Cierra el programa.
+     */
     private void close() {
         if (saveBefore("close the program") != JOptionPane.CANCEL_OPTION) {
             System.exit(0);
         }
     }
 
+    /**
+     * Cierra el archivo.
+     */
     private void closeFile() {
         if (saveBefore("close the file") != JOptionPane.CANCEL_OPTION) {
             file = null;
@@ -414,6 +481,9 @@ public class Window extends javax.swing.JFrame {
     }
     // </editor-fold>             
 
+    /**
+     * Muestra en consola los tokens que componen el código ingresado en el editor.
+     */
     private void lexicalAnalysis() {
         if (!saveFile()) {
             return;
@@ -450,6 +520,9 @@ public class Window extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Muestra en consola los tokens que ingresarán al analizador sintáctico.
+     */
     private void lexicalOutput() {
         if (!saveFile()) {
             return;
@@ -467,14 +540,14 @@ public class Window extends javax.swing.JFrame {
 
             while (true) {
                 token = lexer.yylex();
-                
+
                 if (token == Tokens.Linea) {
                     line++;
                     result += "\n";
                     continue;
                 }
-                
-                if (token == Tokens.ERROR){
+
+                if (token == Tokens.ERROR) {
                     result = "Error lexico en la linea " + line + ": " + lexer.yytext() + " no es valido";
                     return;
                 }
@@ -486,16 +559,18 @@ public class Window extends javax.swing.JFrame {
                 }
 
                 text = getSyntacticEntrance(token, lexer.yytext());
-                component = new Component(line, lexer.yytext(), text, null);
-                
+                component = new Component(line, null, lexer.yytext(), text, null);
+
                 result += component.getToken() + " ";
             }
-
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
+    /**
+     * Muestra los resultados de realizar análisis léxico, sintáctico y semántico al codigo ingresado.
+     */
     private void syntacticAnalysis() {
         if (!saveFile()) {
             return;
@@ -515,49 +590,54 @@ public class Window extends javax.swing.JFrame {
 
             while (true) {
                 token = lexer.yylex();
-                
-                if (syncAnalyzer.isError()){
-                    jTextPaneTerminal.setText(syncAnalyzer.getError());
-                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(),syncAnalyzer.getInput(), syncAnalyzer.getAction()));
-                    return;
-                }
-                
-                if (semAnalyzer.getError() != null){
-                    jTextPaneTerminal.setText(semAnalyzer.getError());
-                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(),syncAnalyzer.getInput(), syncAnalyzer.getAction()));
-                    return;
-                }
-                
-                if (token == Tokens.Linea) {
-                    line++;
-                    continue;
-                }
-                
-                if (token == Tokens.ERROR){
-                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(),syncAnalyzer.getInput(), syncAnalyzer.getAction()));
+
+                if (token == Tokens.ERROR) {
+                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(), syncAnalyzer.getInput(), syncAnalyzer.getAction()));
                     jTextPaneTerminal.setText("Error lexico en la linea " + line + ": " + lexer.yytext() + " no es valido");
                     return;
                 }
 
+                if (syncAnalyzer.isError()) {
+                    jTextPaneTerminal.setText(syncAnalyzer.getError());
+                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(), syncAnalyzer.getInput(), syncAnalyzer.getAction()));
+                    return;
+                }
+
+                if (semAnalyzer.getError() != null) {
+                    jTextPaneTerminal.setText(semAnalyzer.getError());
+                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(), syncAnalyzer.getInput(), syncAnalyzer.getAction()));
+                    return;
+                }
+
+                if (token == Tokens.Linea) {
+                    line++;
+                    continue;
+                }
+
                 if (token == null) {
-                    component = new Component(line, "$", "$", null);
+                    component = new Component(line, null, "$", "$", null);
                     syncAnalyzer.syntacticAnalysis(component, semAnalyzer);
-                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(),syncAnalyzer.getInput(), syncAnalyzer.getAction()));
+                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(), syncAnalyzer.getInput(), syncAnalyzer.getAction()));
+                    jTextPaneTerminal.setText("Successful compilation!");
                     return;
                 }
 
                 text = getSyntacticEntrance(token, lexer.yytext());
-                component = new Component(line, lexer.yytext(), text, null);
-                
-                syncAnalyzer.syntacticAnalysis(component, semAnalyzer);
-                
-            }
+                component = new Component(line, null, lexer.yytext(), text, null);
 
+                syncAnalyzer.syntacticAnalysis(component, semAnalyzer);
+            }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Regresa el tipo de token que encontró el analizador léxico.
+     * @param t Clase Enum que contiene todos los tokens que acepta el analizador léxico
+     * @param text Texto que fue reconocido como token por la gramática.
+     * @return Tipo de token encontrado.
+     */
     private String getSyntacticEntrance(Tokens t, String text) {
         switch (t) {
             case T_Dato:
@@ -579,8 +659,11 @@ public class Window extends javax.swing.JFrame {
         }
         return null;
     }
-    
-    private void clearTerminal(){
+
+    /**
+     * Limpia la terminal.
+     */
+    private void clearTerminal() {
         jTextPaneTerminal.setText("");
     }
 

@@ -9,6 +9,11 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+/**
+ * Clase que lee el contenido de un archivo de Excel.
+ * @author Juan José Silva López
+ * @version 1.0
+ */
 public class ReadSpreadsheet {
 
     // Dependencies: POI | HSSF Workbook/Sheet/Row/Cell
@@ -68,7 +73,7 @@ public class ReadSpreadsheet {
         return transform;
     }
 
-    public static String[] ReadTable(){
+    public static String[] Elements(){
         String[][] dataTable = null;
 	File file = new File("src\\table\\table2.xls");
 	try {

@@ -1,15 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package filemanagment;
 
-import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
- * Class that returns a JFileChooser to open or save files with extension "sg".
+ * Clase para crear un JFileChooser con el filtro para abrir archivos con la extención ".sg".
  * 
  * @author Juan José Silva López
  * @version 1.0

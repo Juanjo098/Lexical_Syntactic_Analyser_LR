@@ -1,6 +1,5 @@
 package syntacticanalyzer;
 
-import data.Component;
 import filemanagment.ReadSpreadsheet;
 import java.util.Stack;
 import data.Component;
@@ -8,22 +7,15 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import semanticanalysis.SemanticAnalysis;
 
+/**
+ * Clase que se ocupa del anális sintáctico.
+ *
+ * @author juanj
+ */
 public class SyntacticAnalyzer {
 
-    public Vector<String> getStackReg() {
-        return stackReg;
-    }
-
-    public Vector<String> getInput() {
-        return input;
-    }
-
-    public Vector<String> getAction() {
-        return action;
-    }
-
     private final String[][] TABLE = ReadSpreadsheet.SpreadsheetTo2dArray();
-    private final String[] ELEMENTS = ReadSpreadsheet.ReadTable();
+    private final String[] ELEMENTS = ReadSpreadsheet.Elements();
     private final String[] PRODUCTIONS = ReadSpreadsheet.Productions();
     private final String[] NO_TERMINALS = ReadSpreadsheet.NoTerminals();
     // <editor-fold defaultstate="collapsed" desc="Error Messages">      
@@ -106,6 +98,12 @@ public class SyntacticAnalyzer {
         action = new Vector<>();
     }
 
+    /**
+     * Muestra el contenido de un Array 2D de Strings
+     *
+     * @param array
+     * @deprecated
+     */
     private void print2dArray(String[][] array) {
         for (String[] strings : array) {
             for (String string : strings) {
@@ -115,6 +113,12 @@ public class SyntacticAnalyzer {
         }
     }
 
+    /**
+     * Muestra el contenido de un Array de Strings
+     *
+     * @param array
+     * @deprecated
+     */
     private void printArray(String[] array) {
         for (String string : array) {
             System.out.print(string + "\t");
@@ -122,6 +126,11 @@ public class SyntacticAnalyzer {
         System.out.println("");
     }
 
+    /**
+     * Análisis sintáctico
+     * @param c Objeto instanciado de la clase Componente que contiene el token a analizar.
+     * @param s Objeto instanciado de la clase SemanticAnalysis que es responsable del análisis semántico
+     */
     public void syntacticAnalysis(Component c, SemanticAnalysis s) {
         while (true) {
             try {
@@ -173,7 +182,6 @@ public class SyntacticAnalyzer {
                     action.add("Desplazar: " + c.getToken() + " " + cell);
                     stack.add(c.getToken());
                     stack.add(cell);
-                    System.out.println("SEMANTICO");
                     s.analysis(c);
                     return;
                 }
@@ -185,14 +193,27 @@ public class SyntacticAnalyzer {
         }
     }
 
+    /**
+     * Determina si se encontró un error sintáctico.
+     * @return true si hay un error | false: si no hay error
+     */
     public boolean isError() {
         return error != null;
     }
-
+    
+    /**
+     * Devuelve el mensaje de error
+     * @return Mensaje de error
+     */
     public String getError() {
         return error;
     }
 
+    /**
+     * Determina en que posición del arreglo se encuentra el token.
+     * @param s Token
+     * @return Posicion del token dentro del arreglo ELEMENTS
+     */
     private int getColumnIndex(String s) {
         for (int i = 0; i < ELEMENTS.length; i++) {
             if (ELEMENTS[i].equals(s)) {
@@ -202,10 +223,18 @@ public class SyntacticAnalyzer {
         return -1;
     }
 
+    /**
+     * Retorna el valor en entero de la cima de la pila.
+     * @return Valor de la cima de la pila.
+     */
     private int getRowIndex() {
         return Integer.parseInt(stack.peek());
     }
 
+    /**
+     * Saca de la pila el doble de elementos de la producción
+     * @param pops número de elementos de la producción
+     */
     private void popStack(int pops) {
         for (int i = 0; i < (pops * 2); i++) {
             stack.pop();
@@ -223,10 +252,20 @@ public class SyntacticAnalyzer {
         System.out.println("");
     }
 
+    /**
+     * Retorna el mensaje de error sintáctico dada la posición encontrada en la cima de la pila.
+     * @param state cima de la pila 
+     * @param c objeto instanciado de la clase Component que contienen la información del token.
+     * @return 
+     */
     private String getErrorMessage(int state, Component c) {
         return "Error sintáctico en la linea: " + c.getLine() + ". Se esperaba un: " + ERROR_MESSAGES[state];
     }
 
+    /**
+     * Retorna el contenido actual de la pila
+     * @return Contenido de la pila.
+     */
     private String getStackStatus() {
         String text = "";
 
@@ -236,4 +275,17 @@ public class SyntacticAnalyzer {
 
         return text;
     }
+
+    public Vector<String> getStackReg() {
+        return stackReg;
+    }
+
+    public Vector<String> getInput() {
+        return input;
+    }
+
+    public Vector<String> getAction() {
+        return action;
+    }
+
 }

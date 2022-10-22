@@ -1,14 +1,25 @@
 package data;
 
-import lexicalanalysis.Tokens;
-
+/**
+ * Clase dedicada a guardar un elemento de la tabla de símbolos.
+ * @author Juan José Silva López
+ * @version 1.0
+ */
 public class Component {
     private int line;
-    private String name, token;
+    private String type, name, token;
     private Object value;
 
-    public Component(int line, String name, String token, Object value) {
+    /**
+     * @param line Linea
+     * @param type Tipo
+     * @param name Nombre
+     * @param token Tipo de token
+     * @param value Valor
+     */
+    public Component(int line, String type, String name, String token, Object value) {
         this.line = line;
+        this.type = type;
         this.name = name;
         this.token = token;
         this.value = value;
@@ -16,6 +27,10 @@ public class Component {
 
     public int getLine() {
         return line;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getName() {
@@ -29,5 +44,15 @@ public class Component {
     public Object getValue() {
         return value;
     }
+
+    public void setType(String type) {
+        this.type = type;
+    }
     
+    /**
+     * Muesta el tipo, el token y el nombre de un elmemento de la tabla de símbolos.
+     */
+    public void showInfo(){
+        System.out.println(type + "\t" + token + "\t" + name);
+    }
 }
