@@ -20,9 +20,25 @@ public class ComponentsList {
     
     private boolean isRepited(Component c){
         for (Component component : componentsList) {
-            if (component.getToken().equals(c.getToken()))
+            if (component.getName().equals(c.getName()))
                 return true;
         }
         return false;
+    }
+    
+    public int repitedPosition(String idName){
+        for (Component component : componentsList) {
+            if (component.getName().equals(idName))
+                return component.getLine();
+        }
+        return -1;
+    }
+    
+    public void showListContent(){
+        if (componentsList.size() != 0)
+        for (Component component : componentsList) {
+            System.out.print(component.getName() + " ");
+        }
+        System.out.println("");
     }
 }

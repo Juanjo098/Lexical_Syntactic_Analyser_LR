@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import lexicalanalysis.Lexer;
 import lexicalanalysis.Tokens;
+import semanticanalysis.SemanticAnalysis;
 
 public class Window extends javax.swing.JFrame {
 
@@ -507,16 +508,23 @@ public class Window extends javax.swing.JFrame {
             Lexer lexer = new Lexer(reader);
             Tokens token;
             Component component;
-            SyntacticAnalyzer analyzer = new SyntacticAnalyzer();
+            SyntacticAnalyzer syncAnalyzer = new SyntacticAnalyzer();
+            SemanticAnalysis semAnalyzer = new SemanticAnalysis();
             int line = 1;
             String text;
 
             while (true) {
                 token = lexer.yylex();
                 
-                if (analyzer.isError()){
-                    jTextPaneTerminal.setText(analyzer.getError());
-                    jTableAnalysis.setModel(new CustomTableModel(analyzer.getStackReg(),analyzer.getInput(), analyzer.getAction()));
+                if (syncAnalyzer.isError()){
+                    jTextPaneTerminal.setText(syncAnalyzer.getError());
+                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(),syncAnalyzer.getInput(), syncAnalyzer.getAction()));
+                    return;
+                }
+                
+                if (semAnalyzer.getError() != null){
+                    jTextPaneTerminal.setText(semAnalyzer.getError());
+                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(),syncAnalyzer.getInput(), syncAnalyzer.getAction()));
                     return;
                 }
                 
@@ -526,22 +534,22 @@ public class Window extends javax.swing.JFrame {
                 }
                 
                 if (token == Tokens.ERROR){
-                    jTableAnalysis.setModel(new CustomTableModel(analyzer.getStackReg(),analyzer.getInput(), analyzer.getAction()));
+                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(),syncAnalyzer.getInput(), syncAnalyzer.getAction()));
                     jTextPaneTerminal.setText("Error lexico en la linea " + line + ": " + lexer.yytext() + " no es valido");
                     return;
                 }
 
                 if (token == null) {
                     component = new Component(line, "$", "$", null);
-                    analyzer.syntacticAnalysis(component);
-                    jTableAnalysis.setModel(new CustomTableModel(analyzer.getStackReg(),analyzer.getInput(), analyzer.getAction()));
+                    syncAnalyzer.syntacticAnalysis(component, semAnalyzer);
+                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(),syncAnalyzer.getInput(), syncAnalyzer.getAction()));
                     return;
                 }
 
                 text = getSyntacticEntrance(token, lexer.yytext());
                 component = new Component(line, lexer.yytext(), text, null);
                 
-                analyzer.syntacticAnalysis(component);
+                syncAnalyzer.syntacticAnalysis(component, semAnalyzer);
                 
             }
 

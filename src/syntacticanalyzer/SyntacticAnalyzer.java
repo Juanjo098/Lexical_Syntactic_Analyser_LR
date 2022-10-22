@@ -6,6 +6,7 @@ import java.util.Stack;
 import data.Component;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import semanticanalysis.SemanticAnalysis;
 
 public class SyntacticAnalyzer {
 
@@ -88,12 +89,14 @@ public class SyntacticAnalyzer {
         "+, -, )",
         "+, -, )",};
     // </editor-fold>
-
-    private int row, column;
-
     private String error, cell;
     private Stack<String> stack;
     private Vector<String> stackReg, input, action;
+    private Component ant;
+
+    private char act;
+    private int row, column;
+    private byte dataType = -1;
 
     public SyntacticAnalyzer() {
         stack = new Stack<>();
@@ -119,14 +122,14 @@ public class SyntacticAnalyzer {
         System.out.println("");
     }
 
-    public void syntacticAnalysis(Component c) {
+    public void syntacticAnalysis(Component c, SemanticAnalysis s) {
         while (true) {
             try {
 
                 row = getRowIndex();
                 column = getColumnIndex(c.getToken());
                 cell = TABLE[row][column];
-                
+
                 stackReg.add(getStackStatus());
                 input.add(c.getToken());
 
@@ -141,13 +144,15 @@ public class SyntacticAnalyzer {
                     return;
                 }
 
-                if (cell.startsWith("r")) {
-                    cell = cell.substring(1, cell.length());
+                act = cell.charAt(0);
+                cell = cell.substring(1, cell.length());
+
+                if (act == 'r') {
                     int pro = Integer.parseInt(cell);
                     int elements, tope;
 
                     action.add("Reducir " + NO_TERMINALS[pro] + " -> " + PRODUCTIONS[pro]);
-                    
+
                     StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
                     elements = st.countTokens();
 
@@ -164,16 +169,18 @@ public class SyntacticAnalyzer {
                     continue;
                 }
 
-                if (cell.startsWith("s")) {
-                    cell = cell.substring(1, cell.length());
+                if (act == 's') {
                     action.add("Desplazar: " + c.getToken() + " " + cell);
                     stack.add(c.getToken());
                     stack.add(cell);
+                    System.out.println("SEMANTICO");
+                    s.analysis(c);
                     return;
                 }
 
             } catch (ArrayIndexOutOfBoundsException e) {
                 error = "Error sintactico";
+                return;
             }
         }
     }
@@ -219,13 +226,14 @@ public class SyntacticAnalyzer {
     private String getErrorMessage(int state, Component c) {
         return "Error sintáctico en la linea: " + c.getLine() + ". Se esperaba un: " + ERROR_MESSAGES[state];
     }
-    
-    private String getStackStatus(){
+
+    private String getStackStatus() {
         String text = "";
-        
-        for (String string : stack)
+
+        for (String string : stack) {
             text += string + " ";
-        
+        }
+
         return text;
     }
 }
