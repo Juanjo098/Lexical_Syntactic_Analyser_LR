@@ -3,6 +3,7 @@ package syntacticanalyzer;
 import filemanagment.ReadSpreadsheet;
 import java.util.Stack;
 import data.Component;
+import graphicinterface.CustomTableModel;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import semanticanalysis.SemanticAnalysis;
@@ -131,10 +132,9 @@ public class SyntacticAnalyzer {
      * @param c Objeto instanciado de la clase Componente que contiene el token a analizar.
      * @param s Objeto instanciado de la clase SemanticAnalysis que es responsable del análisis semántico
      */
-    public void syntacticAnalysis(Component c, SemanticAnalysis s) {
+    public void syntacticAnalysis(Component c, SemanticAnalysis s, CustomTableModel t) {
         while (true) {
             try {
-
                 row = getRowIndex();
                 column = getColumnIndex(c.getToken());
                 cell = TABLE[row][column];
@@ -145,11 +145,13 @@ public class SyntacticAnalyzer {
                 if (cell.equals("")) {
                     action.add("ERROR");
                     error = getErrorMessage(row, c);
+                    t.addRow(getRow());
                     return;
                 }
 
                 if (cell.equals("acc")) {
                     action.add("Aceptado");
+                    t.addRow(getRow());
                     return;
                 }
 
@@ -174,6 +176,8 @@ public class SyntacticAnalyzer {
 
                     stack.add(NO_TERMINALS[pro]);
                     stack.add(TABLE[tope][getColumnIndex(NO_TERMINALS[pro])]);
+                    
+                    t.addRow(getRow());
 
                     continue;
                 }
@@ -183,6 +187,7 @@ public class SyntacticAnalyzer {
                     stack.add(c.getToken());
                     stack.add(cell);
                     s.analysis(c);
+                    t.addRow(getRow());
                     return;
                 }
 
@@ -259,7 +264,7 @@ public class SyntacticAnalyzer {
      * @return 
      */
     private String getErrorMessage(int state, Component c) {
-        return "Error sintáctico en la linea: " + c.getLine() + ". Se esperaba un: " + ERROR_MESSAGES[state];
+        return "Error sintáctico en la linea: " + c.getLine() + ". Se recibió un " + c.getToken() + " y se esperaba un: " + ERROR_MESSAGES[state];
     }
 
     /**
@@ -286,6 +291,14 @@ public class SyntacticAnalyzer {
 
     public Vector<String> getAction() {
         return action;
+    }
+    
+    public Object[] getRow(){
+        Object[] o = new Object[3];
+        o[0] = stackReg.lastElement();
+        o[1] = input.lastElement();
+        o[2] = action.lastElement();
+        return o;
     }
 
 }

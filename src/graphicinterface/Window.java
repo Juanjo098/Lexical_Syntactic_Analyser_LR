@@ -181,6 +181,8 @@ public class Window extends javax.swing.JFrame {
         file = null;
         io = new FileIO();
         filechooser = new CustomJFileChooser();
+        tableModel = new CustomTableModel();
+        jTableAnalysis.setModel(tableModel);
         this.setLocationRelativeTo(null);
         updateLineCount();
         addEvents();
@@ -577,6 +579,7 @@ public class Window extends javax.swing.JFrame {
         }
 
         updateFileTitle();
+        clearTable();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -592,20 +595,17 @@ public class Window extends javax.swing.JFrame {
                 token = lexer.yylex();
 
                 if (token == Tokens.ERROR) {
-                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(), syncAnalyzer.getInput(), syncAnalyzer.getAction()));
                     jTextPaneTerminal.setText("Error lexico en la linea " + line + ": " + lexer.yytext() + " no es valido");
                     return;
                 }
 
                 if (syncAnalyzer.isError()) {
                     jTextPaneTerminal.setText(syncAnalyzer.getError());
-                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(), syncAnalyzer.getInput(), syncAnalyzer.getAction()));
                     return;
                 }
 
                 if (semAnalyzer.getError() != null) {
                     jTextPaneTerminal.setText(semAnalyzer.getError());
-                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(), syncAnalyzer.getInput(), syncAnalyzer.getAction()));
                     return;
                 }
 
@@ -616,8 +616,7 @@ public class Window extends javax.swing.JFrame {
 
                 if (token == null) {
                     component = new Component(line, null, "$", "$", null);
-                    syncAnalyzer.syntacticAnalysis(component, semAnalyzer);
-                    jTableAnalysis.setModel(new CustomTableModel(syncAnalyzer.getStackReg(), syncAnalyzer.getInput(), syncAnalyzer.getAction()));
+                    syncAnalyzer.syntacticAnalysis(component, semAnalyzer, tableModel);
                     jTextPaneTerminal.setText("Successful compilation!");
                     return;
                 }
@@ -625,10 +624,16 @@ public class Window extends javax.swing.JFrame {
                 text = getSyntacticEntrance(token, lexer.yytext());
                 component = new Component(line, null, lexer.yytext(), text, null);
 
-                syncAnalyzer.syntacticAnalysis(component, semAnalyzer);
+                syncAnalyzer.syntacticAnalysis(component, semAnalyzer, tableModel);
             }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void clearTable(){
+        while (tableModel.getRowCount() != 0) {            
+            tableModel.removeRow(0);
         }
     }
 
@@ -695,4 +700,5 @@ public class Window extends javax.swing.JFrame {
     private File file;
     private CustomJFileChooser filechooser;
     private FileIO io;
+    private CustomTableModel tableModel;
 }
