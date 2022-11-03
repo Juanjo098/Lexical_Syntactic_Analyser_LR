@@ -93,6 +93,7 @@ public class SyntacticAnalyzer {
 
     public SyntacticAnalyzer() {
         stack = new Stack<>();
+        stack.add("$");
         stack.add("0");
         stackReg = new Vector<>();
         input = new Vector<>();
