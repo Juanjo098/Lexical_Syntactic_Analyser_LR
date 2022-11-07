@@ -83,7 +83,7 @@ public class SyntacticAnalyzer {
         "+, -, )",};
     // </editor-fold>
     private String error, cell;
-    private Stack<String> stack;
+    private Stack<String> stack, semanticStack;
     private Vector<String> stackReg, input, action;
     private Component ant;
 
@@ -93,6 +93,7 @@ public class SyntacticAnalyzer {
 
     public SyntacticAnalyzer() {
         stack = new Stack<>();
+        semanticStack = new Stack<>();
         stack.add("$");
         stack.add("0");
         stackReg = new Vector<>();
@@ -161,14 +162,20 @@ public class SyntacticAnalyzer {
 
                 if (act == 'r') {
                     int pro = Integer.parseInt(cell);
-                    int elements, tope;
+                    int cont = 0, elements, tope;
 
                     action.add("Reducir " + NO_TERMINALS[pro] + " -> " + PRODUCTIONS[pro]);
 
                     StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
-                    elements = st.countTokens();
+                    String[] prods = new String[st.countTokens()];
+                    
+                    do {                        
+                        prods[cont++] = st.nextToken();
+                    } while (st.hasMoreTokens());
 
-                    if (elements == 1 && st.nextToken().equals("")) {
+                    elements = prods.length;
+                    
+                    if (elements == 1 && prods[0].equals("")) {
                         elements = 0;
                     }
 
@@ -187,7 +194,8 @@ public class SyntacticAnalyzer {
                     action.add("Desplazar: " + c.getToken() + " " + cell);
                     stack.add(c.getToken());
                     stack.add(cell);
-                    s.analysis(c);
+                    s.analysis(c, semanticStack, null);
+                    
                     t.addRow(getRow());
                     return;
                 }

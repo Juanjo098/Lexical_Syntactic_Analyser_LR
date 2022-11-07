@@ -1,6 +1,5 @@
 package graphicinterface;
 
-import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 
 /**
