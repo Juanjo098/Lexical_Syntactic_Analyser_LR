@@ -623,6 +623,17 @@ public class Window extends javax.swing.JFrame {
                 if (token == null) {
                     component = new Component(line, null, "$", "$", null);
                     syncAnalyzer.syntacticAnalysis(component, semAnalyzer, tableModel);
+
+                    if (syncAnalyzer.isError()) {
+                        jTextPaneTerminal.setText(syncAnalyzer.getError());
+                        return;
+                    }
+
+                    if (semAnalyzer.getError() != null) {
+                        jTextPaneTerminal.setText(semAnalyzer.getError());
+                        return;
+                    }
+
                     jTextPaneTerminal.setText("Successful compilation!");
                     return;
                 }
