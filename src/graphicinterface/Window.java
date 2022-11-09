@@ -437,7 +437,9 @@ public class Window extends javax.swing.JFrame {
 
     /**
      * Guarda el archivo.
-     * @return true: si el archivo se guardó | false: si el archivo no se guardó.
+     *
+     * @return true: si el archivo se guardó | false: si el archivo no se
+     * guardó.
      */
     private boolean saveFile() {
         if (isFileLoaded()) {
@@ -449,7 +451,9 @@ public class Window extends javax.swing.JFrame {
 
     /**
      * Guarda el archivo con otro nombre.
-     * @return true: si el archivo se guardó | false: si el archivo no se guardó.
+     *
+     * @return true: si el archivo se guardó | false: si el archivo no se
+     * guardó.
      */
     private boolean saveFileAs() {
         if (filechooser.showSaveDialog(this) == filechooser.APPROVE_OPTION) {
@@ -484,7 +488,8 @@ public class Window extends javax.swing.JFrame {
     // </editor-fold>             
 
     /**
-     * Muestra en consola los tokens que componen el código ingresado en el editor.
+     * Muestra en consola los tokens que componen el código ingresado en el
+     * editor.
      */
     private void lexicalAnalysis() {
         if (!saveFile()) {
@@ -571,7 +576,8 @@ public class Window extends javax.swing.JFrame {
     }
 
     /**
-     * Muestra los resultados de realizar análisis léxico, sintáctico y semántico al codigo ingresado.
+     * Muestra los resultados de realizar análisis léxico, sintáctico y
+     * semántico al codigo ingresado.
      */
     private void syntacticAnalysis() {
         if (!saveFile()) {
@@ -630,16 +636,18 @@ public class Window extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(Window.this, "Error: " + ex.getMessage(), "IOError", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    private void clearTable(){
-        while (tableModel.getRowCount() != 0) {            
+
+    private void clearTable() {
+        while (tableModel.getRowCount() != 0) {
             tableModel.removeRow(0);
         }
     }
 
     /**
      * Regresa el tipo de token que encontró el analizador léxico.
-     * @param t Clase Enum que contiene todos los tokens que acepta el analizador léxico
+     *
+     * @param t Clase Enum que contiene todos los tokens que acepta el
+     * analizador léxico
      * @param text Texto que fue reconocido como token por la gramática.
      * @return Tipo de token encontrado.
      */

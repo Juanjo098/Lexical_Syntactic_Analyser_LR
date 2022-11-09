@@ -5,7 +5,6 @@ import java.util.Stack;
 import data.Component;
 import graphicinterface.CustomTableModel;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import semanticanalysis.SemanticAnalysis;
 
 /**
@@ -84,8 +83,8 @@ public class SyntacticAnalyzer {
     // </editor-fold>
     private String error, cell;
     private Stack<String> stack, semanticStack;
-    private Vector<String> stackReg, input, action;
     private Component ant;
+    private Object[] rowTable;
 
     private char act;
     private int row, column;
@@ -93,12 +92,11 @@ public class SyntacticAnalyzer {
 
     public SyntacticAnalyzer() {
         stack = new Stack<>();
-        semanticStack = new Stack<>();
         stack.add("$");
         stack.add("0");
-        stackReg = new Vector<>();
-        input = new Vector<>();
-        action = new Vector<>();
+        semanticStack = new Stack<>();
+        semanticStack.push("$");
+        rowTable = new Object[4];
     }
 
     /**
@@ -141,19 +139,22 @@ public class SyntacticAnalyzer {
                 column = getColumnIndex(c.getToken());
                 cell = TABLE[row][column];
 
-                stackReg.add(getStackStatus());
-                input.add(c.getToken());
-
+                rowTable[0] = getStackStatus(stack);
+                rowTable[1] = c.getToken();
+                
                 if (cell.equals("")) {
-                    action.add("ERROR");
+                    rowTable[2] = "ERROR";
+                    rowTable[3] = getStackStatus(semanticStack);
+                    
                     error = getErrorMessage(row, c);
-                    t.addRow(getRow());
+                    t.addRow(rowTable);
                     return;
                 }
 
                 if (cell.equals("acc")) {
-                    action.add("Aceptado");
-                    t.addRow(getRow());
+                    rowTable[2] = "Aceptado";
+                    rowTable[3] = getStackStatus(semanticStack);
+                    t.addRow(rowTable);
                     return;
                 }
 
@@ -163,15 +164,16 @@ public class SyntacticAnalyzer {
                 if (act == 'r') {
                     int pro = Integer.parseInt(cell);
                     int cont = 0, elements, tope;
-
-                    action.add("Reducir " + NO_TERMINALS[pro] + " -> " + PRODUCTIONS[pro]);
+                    
+                    rowTable[2] = "Reducir " + NO_TERMINALS[pro] + " -> " + PRODUCTIONS[pro];
+                    rowTable[3] = getStackStatus(semanticStack);
 
                     StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
                     String[] prods = new String[st.countTokens()];
                     
-                    do {                        
+                    while(st.hasMoreTokens()){  
                         prods[cont++] = st.nextToken();
-                    } while (st.hasMoreTokens());
+                    }
 
                     elements = prods.length;
                     
@@ -185,18 +187,27 @@ public class SyntacticAnalyzer {
                     stack.add(NO_TERMINALS[pro]);
                     stack.add(TABLE[tope][getColumnIndex(NO_TERMINALS[pro])]);
                     
-                    t.addRow(getRow());
+                    s.stackProcess(c, semanticStack, prods);
+                    
+                    t.addRow(rowTable);
+                    
+                    if (s.getError() != null){
+                        return;
+                    }
 
                     continue;
                 }
 
                 if (act == 's') {
-                    action.add("Desplazar: " + c.getToken() + " " + cell);
+                    
+                    rowTable[2] = "Desplazar: " + c.getToken() + " " + cell;
+                    rowTable[3] = getStackStatus(semanticStack);
+                    
                     stack.add(c.getToken());
                     stack.add(cell);
-                    s.analysis(c, semanticStack, null);
+                    s.analysis(c, semanticStack);
                     
-                    t.addRow(getRow());
+                    t.addRow(rowTable);
                     return;
                 }
 
@@ -280,7 +291,7 @@ public class SyntacticAnalyzer {
      * Retorna el contenido actual de la pila
      * @return Contenido de la pila.
      */
-    private String getStackStatus() {
+    private String getStackStatus(Stack<String> stack) {
         String text = "";
 
         for (String string : stack) {
@@ -288,26 +299,6 @@ public class SyntacticAnalyzer {
         }
 
         return text;
-    }
-
-    public Vector<String> getStackReg() {
-        return stackReg;
-    }
-
-    public Vector<String> getInput() {
-        return input;
-    }
-
-    public Vector<String> getAction() {
-        return action;
-    }
-    
-    public Object[] getRow(){
-        Object[] o = new Object[3];
-        o[0] = stackReg.lastElement();
-        o[1] = input.lastElement();
-        o[2] = action.lastElement();
-        return o;
     }
 
 }

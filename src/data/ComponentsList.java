@@ -68,4 +68,13 @@ public class ComponentsList {
             }
         }
     }
+    
+    public String getIdType(Component c){
+        for (Component component : componentsList) {
+            if(c.getName().equals(component.getName()))
+                return component.getType();
+        }
+        return null;
+    }
+    
 }

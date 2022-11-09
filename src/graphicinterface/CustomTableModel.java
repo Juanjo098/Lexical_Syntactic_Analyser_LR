@@ -12,6 +12,7 @@ public class CustomTableModel extends DefaultTableModel{
         this.addColumn("Stack");
         this.addColumn("Input");
         this.addColumn("Actions");
+        this.addColumn("Semantic");
     }
 
     @Override
