@@ -12,6 +12,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 /**
  * Clase que lee el contenido de un archivo de Excel.
  * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
  * @version 1.0
  */
 public class ReadSpreadsheet {

@@ -3,6 +3,8 @@ package data;
 /**
  * Clase dedicada a guardar un elemento de la tabla de símbolos.
  * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
+ * 
  * @version 1.0
  */
 public class Component {

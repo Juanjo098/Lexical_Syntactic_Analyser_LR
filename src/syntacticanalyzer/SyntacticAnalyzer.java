@@ -10,7 +10,8 @@ import semanticanalysis.SemanticAnalysis;
 /**
  * Clase que se ocupa del anális sintáctico.
  *
- * @author juanj
+ * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
  */
 public class SyntacticAnalyzer {
 

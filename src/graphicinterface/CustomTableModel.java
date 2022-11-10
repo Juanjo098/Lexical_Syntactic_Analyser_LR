@@ -5,6 +5,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  * Clase extendida de DefaultTableModel que se personalizó para mostrar el proceso del analizador sintáctico.
  * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
  * @version 1.0
  */
 public class CustomTableModel extends DefaultTableModel{

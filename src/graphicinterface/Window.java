@@ -26,6 +26,7 @@ import semanticanalysis.SemanticAnalysis;
  * Clase de la interfaz gráfica del compilador.
  *
  * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
  * @version 1.0
  */
 public class Window extends javax.swing.JFrame {
@@ -317,6 +318,25 @@ public class Window extends javax.swing.JFrame {
     }
 
     /**
+     * Determina si si generó un error de tipo sintáctico o semántico.
+     * @param syncAnalyzer
+     * @param semAnalyzer
+     * @return 
+     */
+    private boolean isInError(SyntacticAnalyzer syncAnalyzer, SemanticAnalysis semAnalyzer) {
+        if (syncAnalyzer.isError()) {
+            jTextPaneTerminal.setText(syncAnalyzer.getError());
+            return true;
+        }
+
+        if (semAnalyzer.isError()) {
+            jTextPaneTerminal.setText(semAnalyzer.getError());
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Muestra en pantalla el contenido del archivo.
      *
      * @param cont
@@ -605,13 +625,7 @@ public class Window extends javax.swing.JFrame {
                     return;
                 }
 
-                if (syncAnalyzer.isError()) {
-                    jTextPaneTerminal.setText(syncAnalyzer.getError());
-                    return;
-                }
-
-                if (semAnalyzer.getError() != null) {
-                    jTextPaneTerminal.setText(semAnalyzer.getError());
+                if (isInError(syncAnalyzer, semAnalyzer)) {
                     return;
                 }
 
@@ -624,13 +638,7 @@ public class Window extends javax.swing.JFrame {
                     component = new Component(line, null, "$", "$", null);
                     syncAnalyzer.syntacticAnalysis(component, semAnalyzer, tableModel);
 
-                    if (syncAnalyzer.isError()) {
-                        jTextPaneTerminal.setText(syncAnalyzer.getError());
-                        return;
-                    }
-
-                    if (semAnalyzer.getError() != null) {
-                        jTextPaneTerminal.setText(semAnalyzer.getError());
+                    if (isInError(syncAnalyzer, semAnalyzer)) {
                         return;
                     }
 
@@ -648,6 +656,9 @@ public class Window extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Limpia la tabla
+     */
     private void clearTable() {
         while (tableModel.getRowCount() != 0) {
             tableModel.removeRow(0);

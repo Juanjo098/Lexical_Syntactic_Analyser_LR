@@ -8,6 +8,7 @@ import java.util.Stack;
  * Clase que realiza el análisis semántico.
  *
  * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
  * @version 1.0
  */
 public class SemanticAnalysis {
@@ -61,10 +62,17 @@ public class SemanticAnalysis {
 
     }
 
+    /**
+     * Proceso para realizar operaciones aritéticas empleando la pila semántica
+     * @param c componente recibido.
+     * @param semanticStack pila de análisis semántico
+     * @param prod producciones a reducir
+     */
     public void stackProcess(Component c, Stack<String> semanticStack, String[] prod) {
         if (dataType == -1) {
             byte op = getOperation(prod);
-
+            // op = 0: Asignación
+            // op = 0: Operación arimética
             switch (op) {
                 case 0:
                     if (!getAssigntionType(semanticStack)){
@@ -83,6 +91,11 @@ public class SemanticAnalysis {
         }
     }
 
+    /**
+     * Determina el tipo de operación a realizar
+     * @param prods producciones a reducir
+     * @return 0: Asignación | 1: Operacción matemática | -1: No se realiza movimiento en la pila semántica
+     */
     public byte getOperation(String[] prods) {
         for (String prod : prods) {
             if (prod.equals("=")) {
@@ -124,6 +137,14 @@ public class SemanticAnalysis {
     }
 
     /**
+     * Determina si se detectó un error semántico.
+     * @return true: se encontró error | false: no se encontró error
+     */
+    public boolean isError(){
+        return error != null;
+    }
+    
+    /**
      * Retorna el error semántico encontrado.
      *
      * @return
@@ -139,6 +160,11 @@ public class SemanticAnalysis {
         list.showListContent();
     }
 
+    /**
+     * Determina a que posición del arreglo corresponde el tipo de dato ingresado
+     * @param t Tipo de dato
+     * @return Posición de tipo de dato
+     */
     private int getDataTypePosition(String t) {
         for (int i = 0; i < DATA_TYPE_LIST.length; i++) {
             if (t.equals(DATA_TYPE_LIST[i])) {
@@ -148,6 +174,11 @@ public class SemanticAnalysis {
         return -1;
     }
 
+    /**
+     * Determina el resultado de una operación aritmética entre los dos últimos elementos de la pila semántica
+     * @param semanticStack
+     * @return 
+     */
     private String getResultType(Stack<String> semanticStack) {
         try {
             int row, column;
@@ -159,6 +190,11 @@ public class SemanticAnalysis {
         }
     }
 
+    /**
+     * Determina si se puede realizar una asignación entre los dos últimos elementos de la pila semántica
+     * @param semanticStack
+     * @return true: se puede asignar | false: si no se puede asignar
+     */
     private boolean getAssigntionType(Stack<String> semanticStack) {
         try {
             int row, column;

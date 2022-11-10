@@ -7,6 +7,7 @@ package lexicalanalysis;
 /**
  * Clase que enumera todos los tokens aceptados por la gramática.
  * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
  * @version 1.0
  */
 public enum Tokens {

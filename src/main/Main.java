@@ -6,6 +6,7 @@ import java.io.File;
 /**
  * Clase que muestra el entorno gráfico.
  * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
  * @version 1.0
  */
 public class Main {

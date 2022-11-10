@@ -5,6 +5,7 @@ import java.util.ArrayList;
 /**
  * Clase responsable de guardar los elementos de la tabla de símbolos.
  * @author Juan José Silva López
+ * @author Arturo Guzmán Ávila
  * @version 1.0
  */
 public class ComponentsList {
@@ -69,6 +70,11 @@ public class ComponentsList {
         }
     }
     
+    /**
+     * Regresa el tipo de dato del id buscado.
+     * @param c Componente buscando en la lista.
+     * @return String con el tipo de dato del id buscado.
+     */
     public String getIdType(Component c){
         for (Component component : componentsList) {
             if(c.getName().equals(component.getName()))
