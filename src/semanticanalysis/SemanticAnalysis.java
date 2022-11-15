@@ -13,10 +13,13 @@ import java.util.Stack;
  */
 public class SemanticAnalysis {
 
+    private final int[] OPERATOR_PRIORITY = new int[]{0, 0, 1, 1};
     private final String[] DATA_TYPE_LIST = new String[]{"int", "float", "char"};
     private final String[] MATH_OPERATORS = new String[]{"+", "-", "*", "/"};
     private final int[][] OPERATION_TABLE = new int[][]{new int[]{0, 1, -1}, new int[]{1, 1, -1}, new int[]{-1, -1, -1}};
     private final boolean[][] ASIGNATION_TABLE = new boolean[][]{new boolean[]{true, false, false}, new boolean[]{true, true, false}, new boolean[]{false, false, true}};
+    private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
+    private final String INT_REGEX = "^\\-?[0-9]+$";
 
     private byte dataType;
 
@@ -53,37 +56,54 @@ public class SemanticAnalysis {
             semanticStack.push(list.getIdType(c));
         }
 
-        past = c;
+        if (c.getToken().equals("num")) {
+            if (c.getName().matches(INT_REGEX)) {
+                semanticStack.push("int");
+            }
+            if (c.getName().matches(FLOAT_REGEX)) {
+                semanticStack.push("float");
+            }
+            return;
+        }
 
         if (c.getToken().equals("=") && past.getToken().equals("id")) {
             var = past;
             return;
         }
 
+        past = c;
+
     }
 
     /**
      * Proceso para realizar operaciones aritéticas empleando la pila semántica
+     *
      * @param c componente recibido.
      * @param semanticStack pila de análisis semántico
      * @param prod producciones a reducir
      */
-    public void stackProcess(Component c, Stack<String> semanticStack, String[] prod) {
+    public void stackProcess(Component c, Stack<String> semanticStack, Stack<String> operators, String[] prod) {
         if (dataType == -1) {
             byte op = getOperation(prod);
+            String operator = getOperator(prod);
             // op = 0: Asignación
             // op = 0: Operación arimética
+
+            if (op != -1) {
+                operatorsProcess(operator, operators);
+            }
+
             switch (op) {
                 case 0:
-                    if (!getAssigntionType(semanticStack)){
+                    if (!getAssigntionType(semanticStack)) {
                         error = "Error semantico en la linea " + c.getLine() + ". No se puede asignar.";
                     }
                     return;
                 case 1:
                     String result = getResultType(semanticStack);
                     semanticStack.push(result);
-                    
-                    if (semanticStack.peek() == null){
+
+                    if (semanticStack.peek() == null) {
                         error = "Error semantico en la linea " + c.getLine() + ". Tipos de datos incompatibles.";
                     }
                     return;
@@ -93,8 +113,10 @@ public class SemanticAnalysis {
 
     /**
      * Determina el tipo de operación a realizar
+     *
      * @param prods producciones a reducir
-     * @return 0: Asignación | 1: Operacción matemática | -1: No se realiza movimiento en la pila semántica
+     * @return 0: Asignación | 1: Operacción matemática | -1: No se realiza
+     * movimiento en la pila semántica
      */
     public byte getOperation(String[] prods) {
         for (String prod : prods) {
@@ -138,12 +160,13 @@ public class SemanticAnalysis {
 
     /**
      * Determina si se detectó un error semántico.
+     *
      * @return true: se encontró error | false: no se encontró error
      */
-    public boolean isError(){
+    public boolean isError() {
         return error != null;
     }
-    
+
     /**
      * Retorna el error semántico encontrado.
      *
@@ -161,7 +184,9 @@ public class SemanticAnalysis {
     }
 
     /**
-     * Determina a que posición del arreglo corresponde el tipo de dato ingresado
+     * Determina a que posición del arreglo corresponde el tipo de dato
+     * ingresado
+     *
      * @param t Tipo de dato
      * @return Posición de tipo de dato
      */
@@ -175,9 +200,11 @@ public class SemanticAnalysis {
     }
 
     /**
-     * Determina el resultado de una operación aritmética entre los dos últimos elementos de la pila semántica
+     * Determina el resultado de una operación aritmética entre los dos últimos
+     * elementos de la pila semántica
+     *
      * @param semanticStack
-     * @return 
+     * @return
      */
     private String getResultType(Stack<String> semanticStack) {
         try {
@@ -191,7 +218,9 @@ public class SemanticAnalysis {
     }
 
     /**
-     * Determina si se puede realizar una asignación entre los dos últimos elementos de la pila semántica
+     * Determina si se puede realizar una asignación entre los dos últimos
+     * elementos de la pila semántica
+     *
      * @param semanticStack
      * @return true: se puede asignar | false: si no se puede asignar
      */
@@ -203,6 +232,49 @@ public class SemanticAnalysis {
             return ASIGNATION_TABLE[row][column];
         } catch (ArrayIndexOutOfBoundsException e) {
             return false;
+        }
+    }
+
+    private String getOperator(String prods[]) {
+        for (String prod : prods) {
+            if (prod.equals("=")) {
+                return prod;
+            }
+            for (String mo : MATH_OPERATORS) {
+                if (prod.equals(mo)) {
+                    return prod;
+                }
+            }
+        }
+        return null;
+    }
+
+    private int getOperatorPriority(String op) {
+        for (int i = 0; i < MATH_OPERATORS.length; i++) {
+            if (MATH_OPERATORS[i].equals(op)) {
+                return OPERATOR_PRIORITY[i];
+            }
+        }
+        return -1;
+    }
+
+    private void operatorsProcess(String op, Stack<String> operators) {
+        if (operators.peek().equals("$")) {
+            operators.push(op);
+            return;
+        }
+
+        if (op.equals("=")) {
+            while (!operators.peek().equals("$")) {
+                operators.pop();
+            }
+            return;
+        }
+
+        if (getOperatorPriority(operators.peek()) >= getOperatorPriority(op)) {
+            operators.pop();
+            operators.push(op);
+            return;
         }
     }
 

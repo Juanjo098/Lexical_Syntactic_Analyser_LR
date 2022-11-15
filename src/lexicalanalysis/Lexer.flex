@@ -57,7 +57,7 @@ espacio=[ \t\r]
 (-?{D}+) {lexeme=yytext(); return Entero;}
 
 /* Flotante */
-(-?{D}+\.{D}+) {lexeme=yytext(); return Flotante;}
+(\-?{D}+\.{D}+) {lexeme=yytext(); return Flotante;}
 
 /* Error de analisis */
  . {return ERROR;}

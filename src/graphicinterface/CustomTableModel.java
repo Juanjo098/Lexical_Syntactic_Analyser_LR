@@ -14,6 +14,8 @@ public class CustomTableModel extends DefaultTableModel{
         this.addColumn("Input");
         this.addColumn("Actions");
         this.addColumn("Semantic");
+        this.addColumn("Operators");
+        this.addColumn("Mid code");
     }
 
     @Override
