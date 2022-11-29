@@ -20,15 +20,19 @@ public class SemanticAnalysis {
     private final boolean[][] ASIGNATION_TABLE = new boolean[][]{new boolean[]{true, false, false}, new boolean[]{true, true, false}, new boolean[]{false, false, true}};
     private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
     private final String INT_REGEX = "^\\-?[0-9]+$";
+    private String midCode;
 
     private byte dataType;
 
     private String error;
     private ComponentsList list;
     private Component past, var;
+    private VarList varList;
 
     public SemanticAnalysis() {
         list = new ComponentsList();
+        varList = new VarList();
+        midCode = "";
     }
 
     /**
@@ -43,26 +47,45 @@ public class SemanticAnalysis {
             c.setType(DATA_TYPE_LIST[dataType]);
             if (!list.addComponent(c)) {
                 error = "Error semántico linea: " + c.getLine() + ". La variable " + c.getName() + " ya fue declarada previamente.";
-                return;
             }
+            midCode += DATA_TYPE_LIST[dataType] + " " + c.getName() + ";\n";
+            past = c;
+            return;
         }
 
         if (c.getToken().equals("id") && !list.isAlreadyDeclared(c)) {
             error = "Error semántico linea: " + c.getLine() + ". La variable " + c.getName() + " no ha sido declarada.";
+            past = c;
             return;
         }
 
         if (dataType == -1 && c.getToken().equals("id")) {
             semanticStack.push(list.getIdType(c));
+            if (var != null) {
+                int index;
+                if ((index = varList.addVar(c.getName())) != -1) {
+                    midCode += varList.get(index).getVar() + " = " + varList.get(index).getValue() + ";\n";
+                }
+            }
+            past = c;
+            return;
         }
 
         if (c.getToken().equals("num")) {
+
             if (c.getName().matches(INT_REGEX)) {
                 semanticStack.push("int");
             }
             if (c.getName().matches(FLOAT_REGEX)) {
                 semanticStack.push("float");
             }
+            int index;
+            
+            if ((index = varList.addVar(c.getName())) != -1) {
+                midCode += varList.get(index).getVar() + " = " + varList.get(index).getValue() + ";\n";
+            }
+            
+            past = c;
             return;
         }
 
@@ -71,7 +94,12 @@ public class SemanticAnalysis {
             return;
         }
 
-        past = c;
+        if (c.getName().equals(";") && (var != null)) {
+            midCode += var.getName() + " = v2;";
+            var = null;
+            past = c;
+            return;
+        }
 
     }
 
@@ -276,6 +304,10 @@ public class SemanticAnalysis {
             operators.push(op);
             return;
         }
+    }
+
+    public String getMidCode() {
+        return midCode;
     }
 
 }

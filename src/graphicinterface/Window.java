@@ -643,6 +643,7 @@ public class Window extends javax.swing.JFrame {
                     }
 
                     jTextPaneTerminal.setText("Successful compilation!");
+                    System.out.println(semAnalyzer.getMidCode());
                     return;
                 }
 
