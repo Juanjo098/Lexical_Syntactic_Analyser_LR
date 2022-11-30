@@ -101,18 +101,13 @@ public class SemanticAnalysis {
                     return;
                 }
 
-                if (getOperatorPriority(operators.peek()) <= getOperatorPriority(c.getToken())) {
+                while (!(operators.peek().equals("(") || operators.peek().equals("$"))) {
+                    if (getOperatorPriority(operators.peek()) >= getOperatorPriority(c.getToken())) {
+                        postfixNotation.push(operators.pop());
+                        continue;
+                    }
                     operators.push(c.getToken());
                     return;
-                }
-                while (true) {
-                    if (operators.peek().equals("$") || operators.peek().equals("(")) {
-                        operators.push(c.getToken());
-                        return;
-                    }
-                    if (getOperatorPriority(c.getToken()) > getOperatorPriority(operators.peek())) {
-                        postfixNotation.push(operators.pop());
-                    }
                 }
             case 1:
                 operators.add(c.getToken());
@@ -135,8 +130,14 @@ public class SemanticAnalysis {
                     return;
                 }
             case 3:
-                while(!operators.peek().equals("$")){
-                    postfixNotation.push(operators.pop());
+                String top3;
+                while (!operators.peek().equals("$")) {
+                    top3 = operators.pop();
+                    if (top3.equals("(")) {
+                        error = "Error sintáctico en la línea " + c.getLine() + ". Falta un paréntesis que cierra.";
+                        return;
+                    }
+                    postfixNotation.push(top3);
                 }
         }
     }
@@ -151,6 +152,11 @@ public class SemanticAnalysis {
         }
         assing = tmp.pop();
 
+        if (tmp.size() == 2){
+            midCode += assing + " = " + tmp.pop() + ";\n";
+            return;
+        }
+        
         while (!tmp.peek().equals("$")) {
             peek = tmp.pop();
             if (isMathOperator(peek) != 0) {
@@ -195,17 +201,7 @@ public class SemanticAnalysis {
                         error = "Error semantico en la linea " + c.getLine() + ". No se puede asignar.";
                         return;
                     }
-
-                    String top;
-                    while (!operators.peek().equals("$")) {
-                        top = operators.pop();
-                        if (top.equals(")")) {
-                            error = "Error sintáctico en la línea " + c.getLine() + ". Falta paréntesis que cierra.";
-                            return;
-                        }
-                        postfixNotation.push(top);
-                    }
-                    //generateMidcode(postfixNotation);
+                    generateMidcode(postfixNotation);
                     return;
                 case 1:
                     String result = getResultType(semanticStack);
