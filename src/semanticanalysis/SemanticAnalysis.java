@@ -135,27 +135,44 @@ public class SemanticAnalysis {
                     return;
                 }
             case 3:
-                String top;
-                while (!operators.peek().equals("$")) {
-                    top = operators.pop();
-                    if (top.equals(")")) {
-                        error = "Error sintáctico en la línea " + c.getLine() + ". Falta paréntesis que cierra.";
-                        return;
-                    }
-                    postfixNotation.push(top);
+                while(!operators.peek().equals("$")){
+                    postfixNotation.push(operators.pop());
                 }
         }
     }
 
     private void generateMidcode(Stack<String> postfixNotation) {
-        Stack<String> tmp = new Stack<>();
+        int index;
+        String peek, assing, tmps = "";
+        Stack<String> tmp = new Stack<>(), op = new Stack<>();
         tmp.push("$");
         while (!postfixNotation.peek().equals("$")) {
             tmp.push(postfixNotation.pop());
-            System.out.println("Hola");
         }
-        tmp.pop();
+        assing = tmp.pop();
 
+        while (!tmp.peek().equals("$")) {
+            peek = tmp.pop();
+            if (isMathOperator(peek) != 0) {
+                index = varList.addVar(peek);
+                op.push(varList.get(index).getVar());
+                midCode += varList.get(index).getVar() + " = " + peek + ";\n";
+                continue;
+            }
+            String value1 = op.pop();
+            String value2 = op.pop();
+            varList.changeState(value1);
+            op.push(value2);
+            midCode += value2 + " = " + value2 + " " + peek + " " + value1 + ";\n";
+        }
+
+        varList.freeAll();
+        for (Var v : varList) {
+            tmps += "#declare " + v.getVar() + ";\n";
+        }
+        midCode += assing + " = " + op.pop() + ";\n";
+        midCode = tmps + midCode;
+        var = null;
     }
 
     /**
@@ -178,9 +195,17 @@ public class SemanticAnalysis {
                         error = "Error semantico en la linea " + c.getLine() + ". No se puede asignar.";
                         return;
                     }
-                    while (!postfixNotation.peek().equals("$")){
-                        postfixNotation.pop();
+
+                    String top;
+                    while (!operators.peek().equals("$")) {
+                        top = operators.pop();
+                        if (top.equals(")")) {
+                            error = "Error sintáctico en la línea " + c.getLine() + ". Falta paréntesis que cierra.";
+                            return;
+                        }
+                        postfixNotation.push(top);
                     }
+                    //generateMidcode(postfixNotation);
                     return;
                 case 1:
                     String result = getResultType(semanticStack);

@@ -26,10 +26,28 @@ public class VarList extends Stack<Var> {
             return index;
         }
 
-        this.push(new Var("v" + (this.size() + 1), value, false));
+        this.push(new Var("v" + (this.size() + 1), value, true));
         return this.size() - 1;
     }
 
+    public void changeState(String var){
+        for (int i = 0; i < this.size(); i++) {
+            Var get = this.get(i);
+            if (get.getVar().equals(var)){
+                get.setInUse(false);
+                this.set(i, get);
+            }
+        }
+    }
+    
+    public void freeAll(){
+        for (int i = 0; i < this.size(); i++) {
+            Var get = this.get(i);
+            get.setInUse(false);
+            this.set(i, get);
+        }
+    }
+    
     private int alreadyExist(String value) {
         for (int i = 0; i < this.size(); i++) {
             Var v = this.get(i);
@@ -42,21 +60,13 @@ public class VarList extends Stack<Var> {
 
     private int findFreePosition() {
         for (int i = 0; i < this.size(); i++) {
+            Var get = this.get(i);
             if (!this.get(i).isInUse()) {
+                get.setInUse(true);
+                this.set(i, get);
                 return i;
             }
         }
         return -1;
     }
-    
-    
-    public static void main(String[] args) {
-        VarList listVar = new VarList();
-        int value;
-        Var var;
-        value = listVar.addVar("5");
-        var = listVar.get(value);
-        System.out.println(var.getVar() + " = " + var.getValue());
-    }
-    
 }

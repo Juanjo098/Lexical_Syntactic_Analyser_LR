@@ -643,6 +643,8 @@ public class Window extends javax.swing.JFrame {
                     }
 
                     jTextPaneTerminal.setText("Successful compilation!");
+                    String path = file.getAbsolutePath().replaceAll(".sg", ".obj");
+                    io.writeFile(new File(path), semAnalyzer.getMidCode());
                     System.out.println(semAnalyzer.getMidCode());
                     return;
                 }
