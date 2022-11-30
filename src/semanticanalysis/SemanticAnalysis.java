@@ -146,18 +146,17 @@ public class SemanticAnalysis {
                 }
         }
     }
-    
-    private void generateMidcode(Stack<String> postfixNotation){
+
+    private void generateMidcode(Stack<String> postfixNotation) {
         Stack<String> tmp = new Stack<>();
         tmp.push("$");
-        while (!postfixNotation.peek().equals("$")) {            
+        while (!postfixNotation.peek().equals("$")) {
             tmp.push(postfixNotation.pop());
             System.out.println("Hola");
         }
         tmp.pop();
-        
-        
-   }
+
+    }
 
     /**
      * Proceso para realizar operaciones aritéticas empleando la pila semántica
@@ -177,6 +176,10 @@ public class SemanticAnalysis {
                 case 0:
                     if (!getAssigntionType(semanticStack)) {
                         error = "Error semantico en la linea " + c.getLine() + ". No se puede asignar.";
+                        return;
+                    }
+                    while (!postfixNotation.peek().equals("$")){
+                        postfixNotation.pop();
                     }
                     return;
                 case 1:
