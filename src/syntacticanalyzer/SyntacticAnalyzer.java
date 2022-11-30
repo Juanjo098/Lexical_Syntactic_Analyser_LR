@@ -83,7 +83,7 @@ public class SyntacticAnalyzer {
         "+, -, )",};
     // </editor-fold>
     private String error, cell;
-    private Stack<String> stack, semanticStack, operators;
+    private Stack<String> stack, semanticStack, operators, postfixNotation;
     private Object[] rowTable;
 
     private char act;
@@ -97,6 +97,8 @@ public class SyntacticAnalyzer {
         semanticStack.push("$");
         operators = new Stack<>();
         operators.push("$");
+        postfixNotation = new Stack<>();
+        postfixNotation.push("$");
         rowTable = new Object[6];
     }
 
@@ -147,7 +149,7 @@ public class SyntacticAnalyzer {
                     rowTable[2] = "ERROR";
                     rowTable[3] = getStackStatus(semanticStack);
                     rowTable[4] = getStackStatus(operators);
-                    rowTable[5] = "";
+                    rowTable[5] = getStackStatus(postfixNotation);
                     
                     error = getErrorMessage(row, c);
                     t.addRow(rowTable);
@@ -158,7 +160,7 @@ public class SyntacticAnalyzer {
                     rowTable[2] = "Aceptado";
                     rowTable[3] = getStackStatus(semanticStack);
                     rowTable[4] = getStackStatus(operators);
-                    rowTable[5] = "";
+                    rowTable[5] = getStackStatus(postfixNotation);
                     t.addRow(rowTable);
                     return;
                 }
@@ -173,7 +175,7 @@ public class SyntacticAnalyzer {
                     rowTable[2] = "Reducir " + NO_TERMINALS[pro] + " -> " + PRODUCTIONS[pro];
                     rowTable[3] = getStackStatus(semanticStack);
                     rowTable[4] = getStackStatus(operators);
-                    rowTable[5] = "";
+                    rowTable[5] = getStackStatus(postfixNotation);;
 
                     StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
                     String[] prods = new String[st.countTokens()];
@@ -194,7 +196,7 @@ public class SyntacticAnalyzer {
                     stack.add(NO_TERMINALS[pro]);
                     stack.add(TABLE[tope][getColumnIndex(NO_TERMINALS[pro])]);
                     
-                    s.stackProcess(c, semanticStack, operators, prods);
+                    s.semanticStackProcess(c, semanticStack, operators, postfixNotation, prods);
                     
                     t.addRow(rowTable);
                     
@@ -209,11 +211,11 @@ public class SyntacticAnalyzer {
                     rowTable[2] = "Desplazar: " + c.getToken() + " " + cell;
                     rowTable[3] = getStackStatus(semanticStack);
                     rowTable[4] = getStackStatus(operators);
-                    rowTable[5] = "";
+                    rowTable[5] = getStackStatus(postfixNotation);;
                     
                     stack.add(c.getToken());
                     stack.add(cell);
-                    s.analysis(c, semanticStack);
+                    s.analysis(c, semanticStack, operators, postfixNotation);
                     
                     t.addRow(rowTable);
                     return;

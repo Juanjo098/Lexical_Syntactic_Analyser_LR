@@ -21,6 +21,7 @@ public class SemanticAnalysis {
     private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
     private final String INT_REGEX = "^\\-?[0-9]+$";
     private String midCode;
+    private String declarations;
 
     private byte dataType;
 
@@ -33,6 +34,7 @@ public class SemanticAnalysis {
         list = new ComponentsList();
         varList = new VarList();
         midCode = "";
+        declarations = "";
     }
 
     /**
@@ -40,7 +42,7 @@ public class SemanticAnalysis {
      *
      * @param c Objeto de la clase Component que contiene el token a analizar.
      */
-    public void analysis(Component c, Stack<String> semanticStack) {
+    public void analysis(Component c, Stack<String> semanticStack, Stack<String> operators, Stack<String> postfixNotation) {
         setDataType(c.getToken());
 
         if (dataType != -1 && c.getToken().equals("id")) {
@@ -61,13 +63,14 @@ public class SemanticAnalysis {
 
         if (dataType == -1 && c.getToken().equals("id")) {
             semanticStack.push(list.getIdType(c));
-            if (var != null) {
-                int index;
-                if ((index = varList.addVar(c.getName())) != -1) {
-                    midCode += varList.get(index).getVar() + " = " + varList.get(index).getValue() + ";\n";
-                }
-            }
+            postfixNotation.add(c.getName());
             past = c;
+            return;
+        }
+
+        if (var != null && c.getToken().equals("id")) {
+            past = c;
+            postfixNotation.add(c.getName());
             return;
         }
 
@@ -79,29 +82,82 @@ public class SemanticAnalysis {
             if (c.getName().matches(FLOAT_REGEX)) {
                 semanticStack.push("float");
             }
-            int index;
-            
-            if ((index = varList.addVar(c.getName())) != -1) {
-                midCode += varList.get(index).getVar() + " = " + varList.get(index).getValue() + ";\n";
-            }
-            
+            postfixNotation.add(c.getName());
             past = c;
             return;
         }
 
         if (c.getToken().equals("=") && past.getToken().equals("id")) {
+            past = c;
             var = past;
             return;
         }
 
-        if (c.getName().equals(";") && (var != null)) {
-            midCode += var.getName() + " = v2;";
-            var = null;
-            past = c;
-            return;
-        }
+        past = c;
+        switch (isMathOperator(c.getToken())) {
+            case 0:
+                if (operators.peek().equals("(") || operators.peek().equals("$")) {
+                    operators.push(c.getToken());
+                    return;
+                }
 
+                if (getOperatorPriority(operators.peek()) <= getOperatorPriority(c.getToken())) {
+                    operators.push(c.getToken());
+                    return;
+                }
+                while (true) {
+                    if (operators.peek().equals("$") || operators.peek().equals("(")) {
+                        operators.push(c.getToken());
+                        return;
+                    }
+                    if (getOperatorPriority(c.getToken()) > getOperatorPriority(operators.peek())) {
+                        postfixNotation.push(operators.pop());
+                    }
+                }
+            case 1:
+                operators.add(c.getToken());
+                return;
+            case 2:
+                String peak;
+                while (true) {
+                    peak = operators.pop();
+
+                    if (peak.equals("$")) {
+                        error = "Error sintáctico en la línea " + c.getLine() + ". Falta paréntesis que abre.";
+                        return;
+                    }
+
+                    if (!peak.equals("(")) {
+                        postfixNotation.push(peak);
+                        continue;
+                    }
+
+                    return;
+                }
+            case 3:
+                String top;
+                while (!operators.peek().equals("$")) {
+                    top = operators.pop();
+                    if (top.equals(")")) {
+                        error = "Error sintáctico en la línea " + c.getLine() + ". Falta paréntesis que cierra.";
+                        return;
+                    }
+                    postfixNotation.push(top);
+                }
+        }
     }
+    
+    private void generateMidcode(Stack<String> postfixNotation){
+        Stack<String> tmp = new Stack<>();
+        tmp.push("$");
+        while (!postfixNotation.peek().equals("$")) {            
+            tmp.push(postfixNotation.pop());
+            System.out.println("Hola");
+        }
+        tmp.pop();
+        
+        
+   }
 
     /**
      * Proceso para realizar operaciones aritéticas empleando la pila semántica
@@ -110,16 +166,12 @@ public class SemanticAnalysis {
      * @param semanticStack pila de análisis semántico
      * @param prod producciones a reducir
      */
-    public void stackProcess(Component c, Stack<String> semanticStack, Stack<String> operators, String[] prod) {
+    public void semanticStackProcess(Component c, Stack<String> semanticStack, Stack<String> operators, Stack<String> postfixNotation, String[] prod) {
         if (dataType == -1) {
             byte op = getOperation(prod);
             String operator = getOperator(prod);
             // op = 0: Asignación
             // op = 0: Operación arimética
-
-            if (op != -1) {
-                operatorsProcess(operator, operators);
-            }
 
             switch (op) {
                 case 0:
@@ -162,7 +214,6 @@ public class SemanticAnalysis {
         }
 
         return -1;
-
     }
 
     /**
@@ -286,24 +337,27 @@ public class SemanticAnalysis {
         return -1;
     }
 
-    private void operatorsProcess(String op, Stack<String> operators) {
-        if (operators.peek().equals("$")) {
-            operators.push(op);
-            return;
-        }
+    private void operatorsProcess(String op, Stack<String> operators, Stack<String> postfixNotation) {
 
-        if (op.equals("=")) {
-            while (!operators.peek().equals("$")) {
-                operators.pop();
+    }
+
+    private byte isMathOperator(String token) {
+        for (String mo : MATH_OPERATORS) {
+            if (token.equals(mo)) {
+                return 0;
             }
-            return;
+        }
+        if (token.equals("(")) {
+            return 1;
+        }
+        if (token.equals(")")) {
+            return 2;
+        }
+        if (token.equals(";")) {
+            return 3;
         }
 
-        if (getOperatorPriority(operators.peek()) >= getOperatorPriority(op)) {
-            operators.pop();
-            operators.push(op);
-            return;
-        }
+        return -1;
     }
 
     public String getMidCode() {

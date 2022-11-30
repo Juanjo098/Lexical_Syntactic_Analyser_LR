@@ -15,7 +15,7 @@ public class CustomTableModel extends DefaultTableModel{
         this.addColumn("Actions");
         this.addColumn("Semantic");
         this.addColumn("Operators");
-        this.addColumn("Mid code");
+        this.addColumn("Postfix notation");
     }
 
     @Override
