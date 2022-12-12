@@ -53,8 +53,8 @@ public class SemanticAnalysis {
             return;
         }
         
-        if (c.getToken().equals("endProgram")) {
-            midCode += c.getName();
+        if (c.getToken().equals("endProgram")|| c.getToken().equals("endIf") || c.getToken().equals("endWhile")) {
+            midCode += c.getName() + "\n";
             return;
         }
         
@@ -92,7 +92,8 @@ public class SemanticAnalysis {
         if (isSentence) {
             if (c.getToken().equals(")")) {
                 midCode += c.getName() + "\n";
-                isProgram = false;
+                isSentence = false;
+                return;
             }
             midCode += c.getName() + " ";
             return;
@@ -427,10 +428,6 @@ public class SemanticAnalysis {
             }
         }
         return -1;
-    }
-
-    private void operatorsProcess(String op, Stack<String> operators, Stack<String> postfixNotation) {
-
     }
 
     private byte isMathOperator(String token) {
