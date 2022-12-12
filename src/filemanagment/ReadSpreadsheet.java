@@ -22,7 +22,7 @@ public class ReadSpreadsheet {
     public static String[][] SpreadsheetTo2dArray() {
         String[][] dataTable = null;
         String[][] transform = null;
-        File file = new File("src\\table\\table2.xls");
+        File file = new File("src\\table\\table3.xls");
         try {
             // Create a file input stream to read Excel workbook and worksheet
             FileInputStream xlfile = new FileInputStream(file);
@@ -76,7 +76,7 @@ public class ReadSpreadsheet {
 
     public static String[] Elements(){
         String[][] dataTable = null;
-	File file = new File("src\\table\\table2.xls");
+	File file = new File("src\\table\\table3.xls");
 	try {
 		// Create a file input stream to read Excel workbook and worksheet
 		FileInputStream xlfile = new FileInputStream(file);
@@ -108,7 +108,7 @@ public class ReadSpreadsheet {
     
     public static String[] Productions(){
         String[][] dataTable = null;
-	File file = new File("src\\table\\table2.xls");
+	File file = new File("src\\table\\table3.xls");
 	try {
 		// Create a file input stream to read Excel workbook and worksheet
 		FileInputStream xlfile = new FileInputStream(file);
@@ -143,7 +143,7 @@ public class ReadSpreadsheet {
     
     public static String[] NoTerminals(){
         String[][] dataTable = null;
-	File file = new File("src\\table\\table2.xls");
+	File file = new File("src\\table\\table3.xls");
 	try {
 		// Create a file input stream to read Excel workbook and worksheet
 		FileInputStream xlfile = new FileInputStream(file);
@@ -162,6 +162,8 @@ public class ReadSpreadsheet {
 		// For each "column" create an HSSFCell to grab the value at the specified cell (i,j)
 		for (int i = 0; i < numRows; i++) {
 			HSSFRow xlRow = xlSheet.getRow(i);
+                        if (xlRow == null)
+                            break;
 			for (int j = 0; j < numCols; j++) {
 				HSSFCell xlCell = xlRow.getCell(j);
                                 if (xlCell.toString().equals("#"))

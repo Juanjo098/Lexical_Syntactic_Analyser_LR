@@ -688,11 +688,14 @@ public class Window extends javax.swing.JFrame {
             case Parentesis_c:
             case Coma:
             case P_coma:
+            case Op_Relacional:
+            case Sentencia:
                 return text;
             case Identificador:
                 return "id";
             case Entero:
             case Flotante:
+            case Cadena:
                 return "num";
         }
         return null;

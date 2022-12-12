@@ -25,5 +25,8 @@ public enum Tokens {
     Identificador,
     Entero,
     Flotante,
+    Op_Relacional,
+    Sentencia,
+    Cadena,
     ERROR
 }

@@ -21,7 +21,10 @@ espacio=[ \t\r]
 ( "\n" ) {return Linea;}
 
 /* Tipos de datos */
-( int | float | char ) {lexeme=yytext(); return T_Dato;}
+( int | float | char | string ) {lexeme=yytext(); return T_Dato;}
+
+/* Sentencias */
+( program | endProgram | read | print | if | endIf | while | endWhile ) {lexeme=yytext(); return Sentencia;}
 
 /* Operador Igual */
 ( "=" ) {lexeme=yytext(); return Igual;}
@@ -37,6 +40,24 @@ espacio=[ \t\r]
 
 /* Operador Division */
 ( "/" ) {lexeme=yytext(); return Division;}
+
+/* Menor que */
+( "<" ) {lexeme=yytext(); return Op_Relacional;}
+
+/* Menor o igual que */
+( <= ) {lexeme=yytext(); return Op_Relacional;}
+
+/* Mayor que */
+( ">" ) {lexeme=yytext(); return Op_Relacional;}
+
+/* Mayor o igual que */
+( ">=" ) {lexeme=yytext(); return Op_Relacional;}
+
+/* Igual */
+( "==" ) {lexeme=yytext(); return Op_Relacional;}
+
+/* Diferente */
+( "!=" ) {lexeme=yytext(); return Op_Relacional;}
 
 /* Parentesis de apertura */
 ( "(" ) {lexeme=yytext(); return Parentesis_a;}
@@ -58,6 +79,9 @@ espacio=[ \t\r]
 
 /* Flotante */
 (\-?{D}+\.{D}+) {lexeme=yytext(); return Flotante;}
+
+/* Flotante */
+(\".*\") {lexeme=yytext(); return Cadena;}
 
 /* Error de analisis */
  . {return ERROR;}

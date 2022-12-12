@@ -20,6 +20,7 @@ public class SemanticAnalysis {
     private final boolean[][] ASIGNATION_TABLE = new boolean[][]{new boolean[]{true, false, false}, new boolean[]{true, true, false}, new boolean[]{false, false, true}};
     private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
     private final String INT_REGEX = "^\\-?[0-9]+$";
+    private boolean isProgram, isSentence;
     private String midCode;
     private String declarations;
 
@@ -44,7 +45,34 @@ public class SemanticAnalysis {
      */
     public void analysis(Component c, Stack<String> semanticStack, Stack<String> operators, Stack<String> postfixNotation) {
         setDataType(c.getToken());
-
+        setProgramState(c.getToken());
+        setSentenceState(c.getToken());
+        
+        if (c.getToken().equals("program")){
+            midCode += c.getName() + " ";
+            return;
+        }
+        
+        if (c.getToken().equals("id" )&& isProgram){
+            midCode += c.getName() + "\n";
+            isProgram = false;
+            return;
+        }
+        
+        if (c.getToken().equals("if") || c.getToken().equals("while")){
+            midCode += c.getName() + " ";
+            return;
+        }
+        
+        if (isSentence){
+            if (c.getToken().equals(")")){
+                midCode += c.getName() + "\n";
+                isProgram = false;
+            }
+                midCode += c.getName() + " ";
+            return;
+        }
+        
         if (dataType != -1 && c.getToken().equals("id")) {
             c.setType(DATA_TYPE_LIST[dataType]);
             if (!list.addComponent(c)) {
@@ -142,6 +170,16 @@ public class SemanticAnalysis {
         }
     }
 
+    private void setProgramState(String t){
+        if (t.equals("program"))
+            isProgram = true;
+    }
+    
+    private void setSentenceState(String t){
+        if (t.equals("if") || t.equals("while"))
+            isSentence = true;
+    }
+    
     private void generateMidcode(Stack<String> postfixNotation) {
         int index;
         String peek, assing, tmps = "";
@@ -193,7 +231,7 @@ public class SemanticAnalysis {
             byte op = getOperation(prod);
             String operator = getOperator(prod);
             // op = 0: Asignación
-            // op = 0: Operación arimética
+            // op = 1: Operación arimética
 
             switch (op) {
                 case 0:
