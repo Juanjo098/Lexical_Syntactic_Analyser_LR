@@ -20,9 +20,8 @@ public class SemanticAnalysis {
     private final boolean[][] ASIGNATION_TABLE = new boolean[][]{new boolean[]{true, false, false}, new boolean[]{true, true, false}, new boolean[]{false, false, true}};
     private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
     private final String INT_REGEX = "^\\-?[0-9]+$";
-    private boolean isProgram, isSentence;
+    private boolean isProgram, isSentence, isPrint;
     private String midCode;
-    private String declarations;
 
     private byte dataType;
 
@@ -35,7 +34,6 @@ public class SemanticAnalysis {
         list = new ComponentsList();
         varList = new VarList();
         midCode = "";
-        declarations = "";
     }
 
     /**
@@ -47,32 +45,59 @@ public class SemanticAnalysis {
         setDataType(c.getToken());
         setProgramState(c.getToken());
         setSentenceState(c.getToken());
-        
-        if (c.getToken().equals("program")){
+        setPrintState(c.getToken());
+
+        if (c.getToken().equals("program")) {
             midCode += c.getName() + " ";
             return;
         }
         
-        if (c.getToken().equals("id" )&& isProgram){
+        if (c.getToken().equals("print")) {
+            return;
+        }
+
+        if (c.getToken().equals("id") && isProgram) {
             midCode += c.getName() + "\n";
             isProgram = false;
             return;
         }
-        
-        if (c.getToken().equals("if") || c.getToken().equals("while")){
+
+        if (c.getToken().equals("if") || c.getToken().equals("while")) {
             midCode += c.getName() + " ";
             return;
         }
-        
-        if (isSentence){
-            if (c.getToken().equals(")")){
+
+        if (isSentence) {
+            if (c.getToken().equals(")")) {
                 midCode += c.getName() + "\n";
                 isProgram = false;
             }
-                midCode += c.getName() + " ";
+            midCode += c.getName() + " ";
             return;
         }
-        
+
+        if (isPrint) {
+            if (c.getToken().equals(")")) {
+                isPrint = false;
+                return;
+            }
+            if (c.getToken().equals("id") || c.getToken().equals("num")){
+                midCode += "print(" + c.getName() + ");\n";
+            }
+        }
+
+        if (c.getToken().equals(";") && postfixNotation.size() > 1) {
+            if (!getAssigntionType(semanticStack)) {
+                error = "Error semantico en la linea " + c.getLine() + ". No se puede asignar.";
+                return;
+            }
+            while (!operators.peek().equals("$")) {
+                postfixNotation.push(operators.pop());
+            }
+            generateMidcode(postfixNotation);
+            return;
+        }
+
         if (dataType != -1 && c.getToken().equals("id")) {
             c.setType(DATA_TYPE_LIST[dataType]);
             if (!list.addComponent(c)) {
@@ -170,16 +195,24 @@ public class SemanticAnalysis {
         }
     }
 
-    private void setProgramState(String t){
-        if (t.equals("program"))
+    private void setProgramState(String t) {
+        if (t.equals("program")) {
             isProgram = true;
+        }
     }
-    
-    private void setSentenceState(String t){
-        if (t.equals("if") || t.equals("while"))
+
+    private void setSentenceState(String t) {
+        if (t.equals("if") || t.equals("while")) {
             isSentence = true;
+        }
     }
-    
+
+    private void setPrintState(String t) {
+        if (t.equals("print")) {
+            isPrint = true;
+        }
+    }
+
     private void generateMidcode(Stack<String> postfixNotation) {
         int index;
         String peek, assing, tmps = "";
@@ -190,11 +223,11 @@ public class SemanticAnalysis {
         }
         assing = tmp.pop();
 
-        if (tmp.size() == 2){
+        if (tmp.size() == 2) {
             midCode += assing + " = " + tmp.pop() + ";\n";
             return;
         }
-        
+
         while (!tmp.peek().equals("$")) {
             peek = tmp.pop();
             if (isMathOperator(peek) != 0) {
@@ -211,11 +244,7 @@ public class SemanticAnalysis {
         }
 
         varList.freeAll();
-        for (Var v : varList) {
-            tmps += "#declare " + v.getVar() + ";\n";
-        }
         midCode += assing + " = " + op.pop() + ";\n";
-        midCode = tmps + midCode;
         var = null;
     }
 
@@ -234,13 +263,6 @@ public class SemanticAnalysis {
             // op = 1: Operación arimética
 
             switch (op) {
-                case 0:
-                    if (!getAssigntionType(semanticStack)) {
-                        error = "Error semantico en la linea " + c.getLine() + ". No se puede asignar.";
-                        return;
-                    }
-                    generateMidcode(postfixNotation);
-                    return;
                 case 1:
                     String result = getResultType(semanticStack);
                     semanticStack.push(result);
@@ -424,6 +446,14 @@ public class SemanticAnalysis {
 
     public String getMidCode() {
         return midCode;
+    }
+
+    public String getDeclarations() {
+        String tmps = "";
+        for (Var v : varList) {
+            tmps += "#declare " + v.getVar() + ";\n";
+        }
+        return tmps;
     }
 
 }
