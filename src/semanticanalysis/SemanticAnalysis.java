@@ -21,7 +21,7 @@ public class SemanticAnalysis {
     private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
     private final String INT_REGEX = "^\\-?[0-9]+$";
     private final String STRING_REGEX = "^\\\".*\\\"$";
-    private boolean isProgram, isSentence, isPrint;
+    private boolean isProgram, isSentence, isPrint, isRead;
     private String midCode;
 
     private byte dataType;
@@ -47,21 +47,22 @@ public class SemanticAnalysis {
         setProgramState(c.getToken());
         setSentenceState(c.getToken());
         setPrintState(c.getToken());
+        setReadState(c.getToken());
 
         if (c.getToken().equals("program") || c.getToken().equals("endProgram")) {
             return;
         }
-        
+
         if (c.getToken().equals("id") && isProgram) {
             isProgram = false;
             return;
         }
-        
-        if ( c.getToken().equals("endIf") || c.getToken().equals("endWhile")) {
+
+        if (c.getToken().equals("endIf") || c.getToken().equals("endWhile")) {
             midCode += "}\n";
             return;
         }
-        
+
         if (dataType != -1 && c.getToken().equals("id")) {
             c.setType(DATA_TYPE_LIST[dataType]);
             if (!list.addComponent(c)) {
@@ -77,11 +78,11 @@ public class SemanticAnalysis {
             past = c;
             return;
         }
-        
-        if (c.getToken().equals("print")) {
+
+        if (c.getToken().equals("print") || c.getToken().equals("read")) {
             return;
         }
-        
+
         if (c.getToken().equals("if") || c.getToken().equals("while")) {
             midCode += c.getName() + " ";
             return;
@@ -99,11 +100,51 @@ public class SemanticAnalysis {
 
         if (isPrint) {
             if (c.getToken().equals(")")) {
+                midCode += ");\n";
                 isPrint = false;
                 return;
             }
-            if (c.getToken().equals("id") || c.getToken().equals("num")){
-                midCode += "printf(" + c.getName() + ");\n";
+            if (c.getToken().equals(",")) {
+                midCode += ");\n";
+                return;
+            }
+            if (c.getToken().equals("id")) {
+                midCode += "printf(" + getPrintArgument(list.getComponent(c.getName()).getType()) + ", " + c.getName() + "";
+                return;
+            }
+            if (c.getToken().equals("num")) {
+                String printType = determineType(c.getName());
+                if (printType != null) {
+                    midCode += "printf(" + getPrintArgument(c.getName()) + ", " + c.getName() + "";
+                    return;
+                }
+                midCode += "printf(" + c.getName();
+            }
+            return;
+        }
+
+        if (isRead) {
+            if (c.getToken().equals("(")) {
+                return;
+            }
+            if (c.getToken().equals(")")) {
+                String toAssign = postfixNotation.pop();
+                semanticStack.pop();
+                midCode += "scanf(" + getPrintArgument(list.getComponent(toAssign).getType()) + ", &" + toAssign + ");\n";
+                isRead = false;
+                return;
+            }
+            if (c.getToken().equals("id")) {
+                midCode += "printf(" + getPrintArgument(list.getComponent(c.getName()).getType()) + ", " + c.getName() + ");\n";
+                return;
+            }
+            if (c.getToken().equals("num")) {
+                String printType = determineType(c.getName());
+                if (printType != null) {
+                    midCode += "printf(" + getPrintArgument(c.getName()) + ", " + c.getName() + ");\n";
+                    return;
+                }
+                midCode += "printf(" + c.getName()+");\n";
             }
             return;
         }
@@ -135,13 +176,8 @@ public class SemanticAnalysis {
 
         if (c.getToken().equals("num")) {
 
-            if (c.getName().matches(INT_REGEX)) {
-                semanticStack.push("int");
-            }
-            if (c.getName().matches(FLOAT_REGEX)) {
-                semanticStack.push("float");
-            }
-            
+            semanticStack.push(determineType(c.getName()));
+
             postfixNotation.add(c.getName());
             past = c;
             return;
@@ -208,6 +244,26 @@ public class SemanticAnalysis {
         }
     }
 
+    private String determineType(String value) {
+        if (value.matches(INT_REGEX)) {
+            return "int";
+        }
+        if (value.matches(FLOAT_REGEX)) {
+            return "float";
+        }
+        return null;
+    }
+
+    private String getPrintArgument(String type) {
+        if (type.equals("int")) {
+            return "\"%i\"";
+        }
+        if (type.equals("float")) {
+            return "\"%f\"";
+        }
+        return null;
+    }
+
     private void setSentenceState(String t) {
         if (t.equals("if") || t.equals("while")) {
             isSentence = true;
@@ -217,6 +273,12 @@ public class SemanticAnalysis {
     private void setPrintState(String t) {
         if (t.equals("print")) {
             isPrint = true;
+        }
+    }
+
+    private void setReadState(String t) {
+        if (t.equals("read")) {
+            isRead = true;
         }
     }
 
@@ -246,11 +308,21 @@ public class SemanticAnalysis {
                 midCode += varList.get(index).getVar() + " = " + peek + ";\n";
                 continue;
             }
-            String value1 = op.pop();
-            String value2 = op.pop();
-            varList.changeState(value1);
-            op.push(value2);
-            midCode += value2 + " = " + value2 + " " + peek + " " + value1 + ";\n";
+            v1 = varList.getVar(op.pop());
+            v2 = varList.getVar(op.pop());
+
+            if (!v1.getType().equals(v2.getType())) {
+                if (v1.getType().equals("float")) {
+                    varList.changeState(v2.getVar());
+                    op.push(v1.getVar());
+                    midCode += v1.getVar() + " = " + v1.getVar() + " " + peek + " " + v2.getVar() + ";\n";
+                    continue;
+                }
+            }
+
+            varList.changeState(v1.getVar());
+            op.push(v2.getVar());
+            midCode += v2.getVar() + " = " + v2.getVar() + " " + peek + " " + v1.getVar() + ";\n";
         }
 
         varList.freeAll();
@@ -271,7 +343,6 @@ public class SemanticAnalysis {
             String operator = getOperator(prod);
             // op = 0: Asignación
             // op = 1: Operación arimética
-
             switch (op) {
                 case 1:
                     String result = getResultType(semanticStack);
