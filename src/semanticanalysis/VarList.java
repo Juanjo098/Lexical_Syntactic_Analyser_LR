@@ -4,6 +4,7 @@
  */
 package semanticanalysis;
 
+import data.Component;
 import java.util.Stack;
 
 /**
@@ -12,56 +13,87 @@ import java.util.Stack;
  */
 public class VarList extends Stack<Var> {
 
-    public int addVar(String value) {
+    private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
+    private final String INT_REGEX = "^\\-?[0-9]+$";
+
+    public int addVar(String v, Component t) {
         int index;
-        
-        if ((index = alreadyExist(value)) != -1) {
+        String value, type;
+
+        if (t != null) {
+            type = t.getType();
+            value = t.getName();
+        } else {
+            value = v;
+            type = determineType(v);
+        }
+
+        if ((index = alreadyExist(value, type)) != -1) {
             return index;
         }
-        
-        if ((index = findFreePosition()) != -1) {
+
+        if ((index = findFreePosition(type)) != -1) {
             Var var = this.get(index);
             var.setValue(value);
             this.set(index, var);
             return index;
         }
 
-        this.push(new Var("v" + (this.size() + 1), value, true));
+        this.push(new Var("v" + (this.size() + 1), value, type, true));
         return this.size() - 1;
     }
 
-    public void changeState(String var){
+    private String determineType(String v) {
+        if (v.matches(INT_REGEX)) {
+            return "int";
+        }
+        if (v.matches(FLOAT_REGEX)) {
+            return "float";
+        }
+        return null;
+    }
+
+    public void changeState(String var) {
         for (int i = 0; i < this.size(); i++) {
             Var get = this.get(i);
-            if (get.getVar().equals(var)){
+            if (get.getVar().equals(var)) {
                 get.setInUse(false);
                 this.set(i, get);
             }
         }
     }
     
-    public void freeAll(){
+    public Var getVar(String id){
+        for (Var v : this) {
+            if (v.getVar().equals(id)){
+                return v;
+            }
+        }
+        return null;
+    }
+
+    public void freeAll() {
         for (int i = 0; i < this.size(); i++) {
             Var get = this.get(i);
             get.setInUse(false);
             this.set(i, get);
         }
     }
-    
-    private int alreadyExist(String value) {
+
+    private int alreadyExist(String value, String type) {
         for (int i = 0; i < this.size(); i++) {
             Var v = this.get(i);
-            if (v.getValue().equals(value) && !v.isInUse()) {
+            if (v.getValue().equals(value) && !v.isInUse() && v.getType().equals(type)) {
                 return i;
             }
         }
         return -1;
     }
 
-    private int findFreePosition() {
+    private int findFreePosition(String type) {
         for (int i = 0; i < this.size(); i++) {
             Var get = this.get(i);
-            if (!this.get(i).isInUse()) {
+            if (!this.get(i).isInUse() && get.getType().equals(type)) {
                 get.setInUse(true);
                 this.set(i, get);
                 return i;

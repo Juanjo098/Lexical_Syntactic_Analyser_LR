@@ -48,19 +48,17 @@ public class SemanticAnalysis {
         setSentenceState(c.getToken());
         setPrintState(c.getToken());
 
-        if (c.getToken().equals("program")) {
-            midCode += c.getName() + " ";
-            return;
-        }
-        
-        if (c.getToken().equals("endProgram")|| c.getToken().equals("endIf") || c.getToken().equals("endWhile")) {
-            midCode += c.getName() + "\n";
+        if (c.getToken().equals("program") || c.getToken().equals("endProgram")) {
             return;
         }
         
         if (c.getToken().equals("id") && isProgram) {
-            midCode += c.getName() + "\n";
             isProgram = false;
+            return;
+        }
+        
+        if ( c.getToken().equals("endIf") || c.getToken().equals("endWhile")) {
+            midCode += "}\n";
             return;
         }
         
@@ -91,7 +89,7 @@ public class SemanticAnalysis {
 
         if (isSentence) {
             if (c.getToken().equals(")")) {
-                midCode += c.getName() + "\n";
+                midCode += c.getName() + "{\n";
                 isSentence = false;
                 return;
             }
@@ -105,7 +103,7 @@ public class SemanticAnalysis {
                 return;
             }
             if (c.getToken().equals("id") || c.getToken().equals("num")){
-                midCode += "print(" + c.getName() + ");\n";
+                midCode += "printf(" + c.getName() + ");\n";
             }
             return;
         }
@@ -224,7 +222,9 @@ public class SemanticAnalysis {
 
     private void generateMidcode(Stack<String> postfixNotation) {
         int index;
+        Component c;
         String peek, assing, tmps = "";
+        Var v1, v2;
         Stack<String> tmp = new Stack<>(), op = new Stack<>();
         tmp.push("$");
         while (!postfixNotation.peek().equals("$")) {
@@ -240,7 +240,8 @@ public class SemanticAnalysis {
         while (!tmp.peek().equals("$")) {
             peek = tmp.pop();
             if (isMathOperator(peek) != 0) {
-                index = varList.addVar(peek);
+                c = list.getComponent(peek);
+                index = varList.addVar(peek, c);
                 op.push(varList.get(index).getVar());
                 midCode += varList.get(index).getVar() + " = " + peek + ";\n";
                 continue;
@@ -454,11 +455,11 @@ public class SemanticAnalysis {
     }
 
     public String getDeclarations() {
-        String tmps = "";
+        String tmps = "//Declaración de variables temporales\n";
         for (Var v : varList) {
-            tmps += "#declare " + v.getVar() + ";\n";
+            tmps += v.getType() + " " + v.getVar() + ";\n";
         }
-        return tmps;
+        return tmps + "//Código a ejecutar\n";
     }
 
 }

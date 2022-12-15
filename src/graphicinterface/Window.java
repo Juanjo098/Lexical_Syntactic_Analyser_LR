@@ -319,9 +319,10 @@ public class Window extends javax.swing.JFrame {
 
     /**
      * Determina si si generó un error de tipo sintáctico o semántico.
+     *
      * @param syncAnalyzer
      * @param semAnalyzer
-     * @return 
+     * @return
      */
     private boolean isInError(SyntacticAnalyzer syncAnalyzer, SemanticAnalysis semAnalyzer) {
         if (syncAnalyzer.isError()) {
@@ -644,8 +645,8 @@ public class Window extends javax.swing.JFrame {
 
                     jTextPaneTerminal.setText("Successful compilation!");
                     String path = file.getAbsolutePath().replaceAll(".sg", ".obj");
-                    io.writeFile(new File(path), semAnalyzer.getDeclarations() + semAnalyzer.getMidCode());
-                    System.out.println(semAnalyzer.getDeclarations() + semAnalyzer.getMidCode());
+                    io.writeFile(new File(path), C_CODE_START + semAnalyzer.getDeclarations() + semAnalyzer.getMidCode() + C_CODE_END);
+                    System.out.println(C_CODE_START + semAnalyzer.getDeclarations() + semAnalyzer.getMidCode() + C_CODE_END);
                     return;
                 }
 
@@ -733,6 +734,12 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextPane jTextPaneTerminal;
     // End of variables declaration//GEN-END:variables
     private final String DEFAULT_WINDOW_TITLE = "Lexical Syntactic Analyser LR";
+    private final String C_CODE_START = "#include <stdio.h>\n"
+            + "\n"
+            + "int main()\n"
+            + "{\n";
+    private final String C_CODE_END = "return 0;\n"
+            + "}";
     private File file;
     private CustomJFileChooser filechooser;
     private FileIO io;

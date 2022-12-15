@@ -83,4 +83,11 @@ public class ComponentsList {
         return null;
     }
     
+    public Component getComponent(String name){
+        for (Component component : componentsList) {
+            if(component.getName().equals(name))
+                return component;
+        }
+        return null;
+    }
 }
