@@ -5,7 +5,9 @@
         <group>
             <file>file:/F:/Programmation%20Projects/java/Lexical_Syntactic_Analyser_LR/src/data/ComponentsList.java</file>
             <file>file:/F:/Programmation%20Projects/java/Lexical_Syntactic_Analyser_LR/src/semanticanalysis/Var.java</file>
+            <file>file:/F:/Programmation%20Projects/java/Lexical_Syntactic_Analyser_LR/src/filemanagment/CustomJFileChooser.java</file>
             <file>file:/F:/Programmation%20Projects/java/Lexical_Syntactic_Analyser_LR/src/semanticanalysis/SemanticAnalysis.java</file>
+            <file>file:/F:/Programmation%20Projects/java/Lexical_Syntactic_Analyser_LR/src/filemanagment/FileIO.java</file>
             <file>file:/F:/Programmation%20Projects/java/Lexical_Syntactic_Analyser_LR/src/semanticanalysis/VarList.java</file>
             <file>file:/F:/Programmation%20Projects/java/Lexical_Syntactic_Analyser_LR/src/graphicinterface/Window.java</file>
         </group>
