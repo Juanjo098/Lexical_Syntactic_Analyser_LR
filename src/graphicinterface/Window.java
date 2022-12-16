@@ -646,7 +646,7 @@ public class Window extends javax.swing.JFrame {
                     jTextPaneTerminal.setText("Successful compilation!");
                     String path = file.getAbsolutePath().replaceAll(".sg", ".c");
                     io.writeFile(new File(path), C_CODE_START + semAnalyzer.getDeclarations() + semAnalyzer.getMidCode() + C_CODE_END);
-                    System.out.println(C_CODE_START + semAnalyzer.getDeclarations() + semAnalyzer.getMidCode() + C_CODE_END);
+                    //System.out.println(C_CODE_START + semAnalyzer.getDeclarations() + semAnalyzer.getMidCode() + C_CODE_END);
                     return;
                 }
 
@@ -697,6 +697,7 @@ public class Window extends javax.swing.JFrame {
             case Entero:
             case Flotante:
             case Cadena:
+            case Caracter:
                 return "num";
         }
         return null;

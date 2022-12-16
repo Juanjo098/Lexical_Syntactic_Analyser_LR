@@ -20,7 +20,7 @@ public class SemanticAnalysis {
     private final boolean[][] ASIGNATION_TABLE = new boolean[][]{new boolean[]{true, false, false}, new boolean[]{true, true, false}, new boolean[]{false, false, true}};
     private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
     private final String INT_REGEX = "^\\-?[0-9]+$";
-    private final String STRING_REGEX = "^\\\".*\\\"$";
+    private final String CHAR_REGEX = "^\\\'.\\\'$";
     private boolean isProgram, isSentence, isPrint, isRead;
     private String midCode;
 
@@ -251,6 +251,9 @@ public class SemanticAnalysis {
         if (value.matches(FLOAT_REGEX)) {
             return "float";
         }
+        if (value.matches(CHAR_REGEX)) {
+            return "char";
+        }
         return null;
     }
 
@@ -260,6 +263,9 @@ public class SemanticAnalysis {
         }
         if (type.equals("float")) {
             return "\"%f\"";
+        }
+        if (type.equals("char")) {
+            return "\"%c\"";
         }
         return null;
     }

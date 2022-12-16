@@ -5,6 +5,7 @@ import static lexicalanalysis.Tokens.*;
 %type Tokens
 L=[a-zA-Z_]+
 D=[0-9]+
+C=[^\"]
 espacio=[ \t\r]
 %{
     public String lexeme;
@@ -15,7 +16,7 @@ espacio=[ \t\r]
 {espacio}+ {/*Ignore*/}
 
 /* Comentarios */
-( "//"(.)* ) {/*Ignore*/}
+( "//".* ) {/*Ignore*/}
 
 /* Salto de linea */
 ( "\n" ) {return Linea;}
@@ -81,7 +82,10 @@ espacio=[ \t\r]
 (\-?{D}+\.{D}+) {lexeme=yytext(); return Flotante;}
 
 /* Flotante */
-(\".*\") {lexeme=yytext(); return Cadena;}
+(\"{C}*\") {lexeme=yytext(); return Cadena;}
+
+/* Flotante */
+(\'{C}\') {lexeme=yytext(); return Caracter;}
 
 /* Error de analisis */
  . {return ERROR;}

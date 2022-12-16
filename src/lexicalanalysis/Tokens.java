@@ -28,5 +28,6 @@ public enum Tokens {
     Op_Relacional,
     Sentencia,
     Cadena,
+    Caracter,
     ERROR
 }

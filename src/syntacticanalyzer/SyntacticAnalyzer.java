@@ -21,66 +21,198 @@ public class SyntacticAnalyzer {
     private final String[] NO_TERMINALS = ReadSpreadsheet.NoTerminals();
     // <editor-fold defaultstate="collapsed" desc="Error Messages">      
     private final String[] ERROR_MESSAGES = new String[]{
-        "id, int, float, char",
+        "program",
         "",
         "id",
+        "id, endProgram, int, float, char, if, while, print",
+        "endProgram",
+        "id, endProgram, if, while, print",
+        "id",
+        "id",
+        "id",
+        "id",
         "",
-        "id",
-        "id",
-        "id",
+        "endProgram",
+        "(",
+        "(",
+        "(",
         "=",
         ",, ;",
-        "id, (, num",
-        "",
+        "id, int, float, char, if, endIf, while, print",
         "id",
-        "id, int, float",
+        "id, int, float, char, if, while, endWhile, print",
+        "id",
+        "id, num",
+        "id, (, num, read",
+        "id, endProgram, if, while, print",
+        "id",
+        "id, endProgram, int, float, char, if, while, print",
+        "endIf",
+        "id, if, endIf, while, print",
+        "id",
+        "<, <=, >, >=, ==, !=",
+        "endWhile",
+        "id, if, while, endWhile, print",
+        "id",
+        "<, <=, >, >=, ==, !=",
+        ")",
+        ",, )",
+        ",, )",
+        ",, )",
         ";",
         ";, +, -",
         ";, +, -, *, /",
         ";, +, -, *, /",
-        "id, (, num",
+        "id, num, read",
         ";, +, -, *, /",
+        "(",
         ",, ;",
-        "",
-        "",
+        "id, endProgram, if, while, print",
+        "id, endProgram, if, while, print",
+        "endIf",
+        "(",
+        "(",
+        "(",
+        "=",
+        ",, ;",
+        "id",
+        "id",
+        "id",
+        "id",
+        "id",
+        "id",
+        "id",
+        "id, endProgram, if, while, print",
+        "endWhile",
+        "(",
+        "(",
+        "(",
+        "=",
+        ",, ;",
+        "id",
         ";",
-        "id, (, num",
-        "id, (, num",
+        ")",
+        "id",
+        "id, num",
+        "id, endProgram, if, while, print",
+        ";",
+        "id, ), num, read",
+        "id, ), num, read",
         ";, +, -",
-        "id, (, num",
-        "id, (, num",
+        "id, (, num, read",
+        "id, (, num, read",
         ")",
         "+, -, )",
         "+, -, *, /, )",
         "+, -, *, /, )",
-        "id, (, num",
+        "id, (, num, read",
         "+, -, *, /, )",
-        "",
+        "(",
+        "id, num",
+        "id, endProgram, if, while, print",
+        "endProgram",
+        "id, int, float, char, if, endIf, while, print",
+        "id",
+        "id, int, float, char, if, while, endWhile, print",
+        "id",
+        "id, num",
+        "id, (, num, read",
+        "id, if, endIf, while, print",
+        "id",
+        "id, int, float, char, if, endIf, while, print",
+        ")",
+        "endProgram",
+        "id, int, float, char, if, endIf, while, print",
+        "id, int, float, char, if, while, endWhile, print",
+        "id",
+        "id, num",
+        "id, (, num, read",
+        "id, if, while, endWhile, print",
+        "id",
+        "id, int, float, char, if, while, endWhile, print",
+        ")",
+        "id, endProgram, if, while, print",
+        ",, )",
+        "endProgram",
         ";, +, -",
         ";, +, -",
         ";, +, -, *, /",
         ";, +, -, *, /",
         ";, +, -, *, /",
         ")",
-        "id, (, num",
-        "id, (, num",
+        "id, (, num, read",
+        "id, (, num, read",
         "+, -, )",
-        "id, (, num",
-        "id, (, num",
+        "id, (, num, read",
+        "id, (, num, read",
+        ")",
+        "id, num",
+        ")",
+        ")",
+        ")",
+        "endIf",
+        "<, <=, >, >=, ==, !=",
+        "endWhile",
+        "<, <=, >, >=, ==, !=",
+        ")",
+        ";",
+        ",, ;",
+        "id, if, endIf, while, print",
+        "id, int, float, char, if, endIf, while, print",
+        "endIf",
+        "endWhile",
+        "<, <=, >, >=, ==, !=",
+        ")",
+        ";",
+        ",, ;",
+        "id, if, while, endWhile, print",
+        "id, int, float, char, if, while, endWhile, print",
+        "endProgram",
         ")",
         ";",
         ";",
         ";, +, -",
         ";, +, -",
+        "+, -, )",
+        "+, -, ) ",
+        "+, -, *, /, )",
+        "+, -, *, /, )",
+        "+, -, *, /, )",
+        ")",
+        "+, -, *, /, )",
+        "id, if, endIf, while, print",
+        "id",
+        "id, if, endIf, while, print",
+        "id",
+        ";",
+        "id, if, endIf, while, print",
+        "id, if, endIf, while, print",
+        "id",
+        ";",
+        "id, if, endIf, while, print",
+        "id, if, endIf, while, print",
+        ")",
+        ")",
         "+, -, )",
         "+, -, )",
         "+, -, *, /, )",
-        "+, -, *, /, ",
-        "+, -, *, /, ",
+        "endIf",
         ")",
+        "endIf",
         ")",
-        "+, -, )",
-        "+, -, )",};
+        "id, if, endIf, while, print",
+        "endIf",
+        "endWhile",
+        "endWhile",
+        ")",
+        "id, if, endIf, while, print",
+        "endWhile",
+        "id, int, float, char, if, endIf, while, print",
+        "id, int, float, char, if, endIf, while, endWhile, print",
+        "endIf",
+        "id, int, float, char, if, while, endWhile, print",
+        "endWhile",
+        };
     // </editor-fold>
     private String error, cell;
     private Stack<String> stack, semanticStack, operators, postfixNotation;
@@ -132,8 +264,11 @@ public class SyntacticAnalyzer {
 
     /**
      * Análisis sintáctico
-     * @param c Objeto instanciado de la clase Componente que contiene el token a analizar.
-     * @param s Objeto instanciado de la clase SemanticAnalysis que es responsable del análisis semántico
+     *
+     * @param c Objeto instanciado de la clase Componente que contiene el token
+     * a analizar.
+     * @param s Objeto instanciado de la clase SemanticAnalysis que es
+     * responsable del análisis semántico
      */
     public void syntacticAnalysis(Component c, SemanticAnalysis s, CustomTableModel t) {
         while (true) {
@@ -144,13 +279,13 @@ public class SyntacticAnalyzer {
 
                 rowTable[0] = getStackStatus(stack);
                 rowTable[1] = c.getToken();
-                
+
                 if (cell.equals("")) {
                     rowTable[2] = "ERROR";
                     rowTable[3] = getStackStatus(semanticStack);
                     rowTable[4] = getStackStatus(operators);
                     rowTable[5] = getStackStatus(postfixNotation);
-                    
+
                     error = getErrorMessage(row, c);
                     t.addRow(rowTable);
                     return;
@@ -171,7 +306,7 @@ public class SyntacticAnalyzer {
                 if (act == 'r') {
                     int pro = Integer.parseInt(cell);
                     int cont = 0, elements, tope;
-                    
+
                     rowTable[2] = "Reducir " + NO_TERMINALS[pro] + " -> " + PRODUCTIONS[pro];
                     rowTable[3] = getStackStatus(semanticStack);
                     rowTable[4] = getStackStatus(operators);
@@ -179,13 +314,13 @@ public class SyntacticAnalyzer {
 
                     StringTokenizer st = new StringTokenizer(PRODUCTIONS[pro], " ");
                     String[] prods = new String[st.countTokens()];
-                    
-                    while(st.hasMoreTokens()){  
+
+                    while (st.hasMoreTokens()) {
                         prods[cont++] = st.nextToken();
                     }
 
                     elements = prods.length;
-                    
+
                     if (elements == 1 && prods[0].equals("")) {
                         elements = 0;
                     }
@@ -195,12 +330,12 @@ public class SyntacticAnalyzer {
 
                     stack.add(NO_TERMINALS[pro]);
                     stack.add(TABLE[tope][getColumnIndex(NO_TERMINALS[pro])]);
-                    
+
                     s.semanticStackProcess(c, semanticStack, operators, postfixNotation, prods);
-                    
+
                     t.addRow(rowTable);
-                    
-                    if (s.getError() != null){
+
+                    if (s.getError() != null) {
                         return;
                     }
 
@@ -212,11 +347,11 @@ public class SyntacticAnalyzer {
                     rowTable[3] = getStackStatus(semanticStack);
                     rowTable[4] = getStackStatus(operators);
                     rowTable[5] = getStackStatus(postfixNotation);;
-                    
+
                     stack.add(c.getToken());
                     stack.add(cell);
                     s.analysis(c, semanticStack, operators, postfixNotation);
-                    
+
                     t.addRow(rowTable);
                     return;
                 }
@@ -230,14 +365,16 @@ public class SyntacticAnalyzer {
 
     /**
      * Determina si se encontró un error sintáctico.
+     *
      * @return true si hay un error | false: si no hay error
      */
     public boolean isError() {
         return error != null;
     }
-    
+
     /**
      * Devuelve el mensaje de error
+     *
      * @return Mensaje de error
      */
     public String getError() {
@@ -246,6 +383,7 @@ public class SyntacticAnalyzer {
 
     /**
      * Determina en que posición del arreglo se encuentra el token.
+     *
      * @param s Token
      * @return Posicion del token dentro del arreglo ELEMENTS
      */
@@ -260,6 +398,7 @@ public class SyntacticAnalyzer {
 
     /**
      * Retorna el valor en entero de la cima de la pila.
+     *
      * @return Valor de la cima de la pila.
      */
     private int getRowIndex() {
@@ -268,6 +407,7 @@ public class SyntacticAnalyzer {
 
     /**
      * Saca de la pila el doble de elementos de la producción
+     *
      * @param pops número de elementos de la producción
      */
     private void popStack(int pops) {
@@ -288,10 +428,13 @@ public class SyntacticAnalyzer {
     }
 
     /**
-     * Retorna el mensaje de error sintáctico dada la posición encontrada en la cima de la pila.
-     * @param state cima de la pila 
-     * @param c objeto instanciado de la clase Component que contienen la información del token.
-     * @return 
+     * Retorna el mensaje de error sintáctico dada la posición encontrada en la
+     * cima de la pila.
+     *
+     * @param state cima de la pila
+     * @param c objeto instanciado de la clase Component que contienen la
+     * información del token.
+     * @return
      */
     private String getErrorMessage(int state, Component c) {
         return "Error sintáctico en la linea: " + c.getLine() + ". Se recibió un " + c.getToken() + " y se esperaba un: " + ERROR_MESSAGES[state];
@@ -299,6 +442,7 @@ public class SyntacticAnalyzer {
 
     /**
      * Retorna el contenido actual de la pila
+     *
      * @return Contenido de la pila.
      */
     private String getStackStatus(Stack<String> stack) {
