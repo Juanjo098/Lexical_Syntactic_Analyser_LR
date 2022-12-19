@@ -21,7 +21,7 @@ public class SemanticAnalysis {
     private final String FLOAT_REGEX = "^\\-?[0-9]+\\.[0-9]+$";
     private final String INT_REGEX = "^\\-?[0-9]+$";
     private final String CHAR_REGEX = "^\\\'.\\\'$";
-    private boolean isProgram, isSentence, isPrint, isRead;
+    private boolean isProgram, isIf, isWhile, isPrint, isRead;
     private String midCode;
 
     private byte dataType;
@@ -30,10 +30,12 @@ public class SemanticAnalysis {
     private ComponentsList list;
     private Component past, var;
     private VarList varList;
+    private SentenceList sentenceList;
 
     public SemanticAnalysis() {
         list = new ComponentsList();
         varList = new VarList();
+        sentenceList = new SentenceList();
         midCode = "";
     }
 
@@ -45,7 +47,8 @@ public class SemanticAnalysis {
     public void analysis(Component c, Stack<String> semanticStack, Stack<String> operators, Stack<String> postfixNotation) {
         setDataType(c.getToken());
         setProgramState(c.getToken());
-        setSentenceState(c.getToken());
+        setIfState(c.getToken());
+        setWhileState(c.getToken());
         setPrintState(c.getToken());
         setReadState(c.getToken());
 
@@ -58,8 +61,15 @@ public class SemanticAnalysis {
             return;
         }
 
-        if (c.getToken().equals("endIf") || c.getToken().equals("endWhile")) {
-            midCode += "}\n";
+        if (c.getToken().equals("endIf")) {
+            midCode += "end" + sentenceList.getNextSentenseToClose("if")+ ":\n";
+            sentenceList.closeSetence("if");
+            return;
+        }
+        
+        if (c.getToken().equals("endWhile")) {
+            midCode += "goto "+ sentenceList.getNextSentenseToClose("while") + ";\nend" + sentenceList.getNextSentenseToClose("while")+ ":\n";
+            sentenceList.closeSetence("while");
             return;
         }
 
@@ -83,18 +93,49 @@ public class SemanticAnalysis {
             return;
         }
 
-        if (c.getToken().equals("if") || c.getToken().equals("while")) {
-            midCode += c.getName() + " ";
-            return;
-        }
-
-        if (isSentence) {
-            if (c.getToken().equals(")")) {
-                midCode += c.getName() + "{\n";
-                isSentence = false;
+        if (isIf){
+            if (c.getToken().equals("if")){
+                sentenceList.addSentence("if");
+                midCode += "if ";
                 return;
             }
-            midCode += c.getName() + " ";
+            if (c.getToken().equals("(")){
+                midCode += "(!(";
+                return;
+            }
+            if (c.getToken().equals(")")){
+                midCode += ")) goto end"+ sentenceList.getNextSentenseToClose("if") + ";\n";
+                isIf = false;
+                return;
+            }
+            if (c.getToken().equals("id")){
+                midCode += c.getName();
+                return;
+            }
+            midCode += c.getToken();
+            return;
+        }
+        
+        if (isWhile){
+            if (c.getToken().equals("while")){
+                sentenceList.addSentence("while");
+                midCode += sentenceList.getNextSentenseToClose("while") + ":\nif ";
+                return;
+            }
+            if (c.getToken().equals("(")){
+                midCode += "(!(";
+                return;
+            }
+            if (c.getToken().equals(")")){
+                midCode += ")) goto end"+ sentenceList.getNextSentenseToClose("while") + ";\n";
+                isWhile = false;
+                return;
+            }
+            if (c.getToken().equals("id")){
+                midCode += c.getName();
+                return;
+            }
+            midCode += c.getToken();
             return;
         }
 
@@ -270,9 +311,15 @@ public class SemanticAnalysis {
         return null;
     }
 
-    private void setSentenceState(String t) {
-        if (t.equals("if") || t.equals("while")) {
-            isSentence = true;
+    private void setIfState(String t) {
+        if (t.equals("if")) {
+            isIf = true;
+        }
+    }
+    
+    private void setWhileState(String t) {
+        if (t.equals("while")) {
+            isWhile = true;
         }
     }
 
